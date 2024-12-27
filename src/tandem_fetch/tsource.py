@@ -1,5 +1,4 @@
-"""Code for working with the Tandem Source API to fetch pump
-data."""
+"""Code for working with the Tandem Source API to fetch pump data."""
 
 import base64
 import datetime
@@ -14,7 +13,8 @@ import requests
 from loguru import logger
 
 from tandem_fetch.credentials import TConnectCredentials
-from tandem_fetch.events.events import EVENT_IDS
+from tandem_fetch.events.events import EVENT_IDS, BaseEvent
+from tandem_fetch.events.generic import decode_raw_events, get_event_generator
 
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.124 Safari/537.36 Edg/102.0.1245.44"
 DEFAULT_START_DATE = datetime.date(2024, 12, 23)
@@ -210,13 +210,8 @@ class TSourceAPI:
             raise requests.HTTPError(msg, response=response)
         return response.json()
 
-    def _get_pump_events_raw(
-        self, start_date: datetime.date = DEFAULT_START_DATE, end_date: datetime.date | None = None
-    ) -> str:
+    def _get_pump_events_raw(self, start_date: datetime.date, end_date: datetime.date) -> str:
         """Get raw pump events."""
-        if end_date is None:
-            end_date = datetime.date.today()
-
         if self.tconnect_device_id is None:
             self._load_pump_device_id()
 
@@ -238,3 +233,14 @@ class TSourceAPI:
             msg = f"Failed to get pump event data: {response}"
             raise requests.HTTPError(msg, response=response)
         return response.json()
+
+    def get_pump_events(
+        self, start_date: datetime.date = DEFAULT_START_DATE, end_date: datetime.date | None = None
+    ) -> list[BaseEvent]:
+        """Get pump events for the given time period."""
+        if end_date is None:
+            end_date = datetime.date.today()
+
+        raw_pump_events = self._get_pump_events_raw(start_date=start_date, end_date=end_date)
+        decoded_events = decode_raw_events(raw_pump_events)
+        return list(get_event_generator(decoded_events))

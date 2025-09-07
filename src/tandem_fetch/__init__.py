@@ -1,5 +1,9 @@
+import polars as pl
+
+pl.Config.set_fmt_str_lengths(1000)
+pl.Config.set_tbl_rows(100)
+
 from tandem_fetch import credentials, tsource
-from tandem_fetch.events.generic import decode_raw_events, get_event_generator
 
 
 def main() -> None:
@@ -11,4 +15,13 @@ def main() -> None:
     pump_events = api.get_pump_events()
     print(f"{pumper_info=}")
     print(f"{pump_event_metadata=}")
+    print(f"Number of pump events: {len(pump_events)=}")
+    print("Last 2 events:")
     print(pump_events[-2:])
+
+    df_events = pl.DataFrame(
+        {
+            "event_name": [repr(e.NAME) for e in pump_events],
+        }
+    )
+    print(df_events["event_name"].value_counts().sort("count", descending=True))

@@ -13,8 +13,8 @@ import requests
 from loguru import logger
 
 from tandem_fetch.credentials import TConnectCredentials
-from tandem_fetch.events.events import EVENT_IDS, BaseEvent
-from tandem_fetch.events.generic import decode_raw_events, get_event_generator
+from tandem_fetch.pump_events.events import EVENT_IDS, BaseEvent
+from tandem_fetch.pump_events.generic import decode_raw_events, get_event_generator
 
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.124 Safari/537.36 Edg/102.0.1245.44"
 DEFAULT_START_DATE = datetime.date(2025, 9, 1)

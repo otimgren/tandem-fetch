@@ -1,9 +1,9 @@
 import base64
 from typing import Generator
 
-from tandem_fetch.events.events import EVENT_IDS, BaseEvent
-from tandem_fetch.events.raw_event import EVENT_LEN, RawEvent
-from tandem_fetch.events.utils import batched
+from tandem_fetch.pump_events.events import EVENT_IDS, BaseEvent
+from tandem_fetch.pump_events.raw_event import EVENT_LEN, RawEvent
+from tandem_fetch.pump_events.utils import batched
 
 
 def decode_raw_events(raw_events: str) -> bytearray:

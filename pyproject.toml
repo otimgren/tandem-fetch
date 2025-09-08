@@ -13,6 +13,7 @@ dependencies = [
     "cryptography>=44.0.0",
     "loguru>=0.7.3",
     "polars>=1.33.0",
+    "prefect>=3.4.17",
     "psycopg2>=2.9.10",
     "pyjwt>=2.10.1",
     "requests>=2.32.3",

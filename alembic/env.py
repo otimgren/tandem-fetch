@@ -1,13 +1,25 @@
+import os
+import sys
 from logging.config import fileConfig
 
+import dotenv
 from sqlalchemy import engine_from_config, pool
 
 from alembic import context
 from tandem_fetch.db.base import Base
 
+# Import all models so they are registered with SQLAlchemy metadata
+from tandem_fetch.db.raw_events.models import RawEvents  # noqa: F401
+
+dotenv.load_dotenv()
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
+db_url = os.getenv("DATABASE_URL")
+if db_url:
+    config.set_main_option("sqlalchemy.url", db_url)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.

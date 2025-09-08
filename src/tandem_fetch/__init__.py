@@ -1,3 +1,5 @@
+from dataclasses import asdict
+
 import polars as pl
 
 pl.Config.set_fmt_str_lengths(1000)
@@ -25,3 +27,6 @@ def main() -> None:
         }
     )
     print(df_events["event_name"].value_counts().sort("count", descending=True))
+
+    event = pump_events[0]
+    print(f"First event: {asdict(event)}, name: {event.NAME}")

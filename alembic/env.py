@@ -8,9 +8,6 @@ from sqlalchemy import engine_from_config, pool
 from alembic import context
 from tandem_fetch.db.base import Base
 
-# Import all models so they are registered with SQLAlchemy metadata
-from tandem_fetch.db.raw_events.models import RawEvents  # noqa: F401
-
 dotenv.load_dotenv()
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 

@@ -9,7 +9,7 @@ from tandem_fetch.db.base import Base
 
 
 @final
-class RawEvents(Base):
+class RawEvent(Base):
     """Model for storing raw event data.
 
     Attributes:

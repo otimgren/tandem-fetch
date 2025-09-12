@@ -1,12 +1,10 @@
 """Script to parse raw_events table entries into structured events in the events table."""
 
-from curses import raw
-
 import dateutil
 from loguru import logger
 from prefect import flow, task
 from prefect.cache_policies import NO_CACHE
-from sqlalchemy import Integer, create_engine
+from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from tandem_fetch.db.events import Event

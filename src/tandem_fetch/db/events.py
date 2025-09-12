@@ -3,7 +3,6 @@
 from typing import final
 
 from sqlalchemy import JSON, Column, DateTime, Integer, Text
-from sqlalchemy.orm import foreign
 from sqlalchemy.sql import func
 
 from tandem_fetch.db.base import Base

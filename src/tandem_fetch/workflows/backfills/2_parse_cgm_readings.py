@@ -1,14 +1,9 @@
 """Script to parse CGM readings from events table into cgm_readings table."""
 
-from typing import Any
-
 from loguru import logger
 from prefect import flow, task
 from sqlalchemy import create_engine, text
-from sqlalchemy.orm import sessionmaker
 
-from tandem_fetch.db.cgm_readings import CgmReading
-from tandem_fetch.db.events import Event
 from tandem_fetch.definitions import DATABASE_URL
 
 
@@ -44,13 +39,8 @@ def populate_cgm_readings() -> None:
 
 @flow(name="populate-cgm-readings")
 def populate_cgm_readings_flow() -> None:
-    """Populate the CGM readings table.
-
-    Args:
-        method: Method to use ("raw_sql", "orm", or "batch_orm")
-        batch_size: Batch size for batch_orm method
-    """
-    logger.info(f"Starting CGM readings population")
+    """Populate the CGM readings table."""
+    logger.info("Starting CGM readings population")
 
     populate_cgm_readings()
     logger.success("CGM readings population completed")

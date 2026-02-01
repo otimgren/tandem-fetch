@@ -125,15 +125,15 @@
 
 **Purpose**: Documentation, validation, and final checks
 
-- [ ] T042 Update README.md with "Pre-Commit Hooks" section linking to quickstart guide
-- [ ] T043 Add setup instructions to README.md: "Run `uv tool install prek` and `prek install`"
-- [ ] T044 Copy specs/002-precommit-hooks/quickstart.md to docs/pre-commit-hooks.md (create docs/ if needed)
-- [ ] T045 Validate SC-003: Measure hook execution time with `time git commit` on small change, verify <5 seconds
-- [ ] T046 Validate SC-004: Follow README setup instructions on clean environment, verify one-command setup
-- [ ] T047 Run full commit workflow test: modify file, stage, commit, verify all hooks run successfully
-- [ ] T048 Document bypass mechanism in README.md: "Use `SKIP=hook-id git commit` for exceptional cases"
-- [ ] T049 Add `.gitleaksignore` to .gitignore (file may be created during usage but should be tracked)
-- [ ] T050 Verify all configuration files are committed: .pre-commit-config.yaml, .gitleaks.toml, updated pyproject.toml
+- [x] T042 Update README.md with "Pre-Commit Hooks" section linking to quickstart guide
+- [x] T043 Add setup instructions to README.md: "Run `uv tool install prek` and `prek install`"
+- [x] T044 Copy specs/002-precommit-hooks/quickstart.md to docs/pre-commit-hooks.md (create docs/ if needed)
+- [x] T045 Validate SC-003: Measure hook execution time with `time git commit` on small change, verify <5 seconds
+- [x] T046 Validate SC-004: Follow README setup instructions on clean environment, verify one-command setup
+- [x] T047 Run full commit workflow test: modify file, stage, commit, verify all hooks run successfully
+- [x] T048 Document bypass mechanism in README.md: "Use `SKIP=hook-id git commit` for exceptional cases"
+- [x] T049 Add `.gitleaksignore` to .gitignore (file may be created during usage but should be tracked)
+- [x] T050 Verify all configuration files are committed: .pre-commit-config.yaml, .gitleaks.toml, updated pyproject.toml
 
 ---
 

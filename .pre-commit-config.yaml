@@ -3,6 +3,23 @@
 # Run hooks manually: uv run prek run --all-files
 
 repos:
+  # Builtin hooks: Fast file validation (offline, instant)
+  - repo: builtin
+    hooks:
+      - id: trailing-whitespace
+        args: ['--markdown-linebreak-ext=md']
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+        args: ['--fix=lf']
+      - id: check-yaml
+        exclude: 'specs/.*/contracts/.*\.yaml$'  # Exclude contract schema files
+      - id: check-toml
+      - id: check-json
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+      - id: check-case-conflict
+      - id: check-merge-conflict
+
   # Ruff: Fast Python linter and formatter
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.14.14

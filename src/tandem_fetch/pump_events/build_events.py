@@ -144,7 +144,7 @@ def build_transform_funcs(event_def):
     ret = []
 
     for name, field in event_def["data"].items():
-        if not "transform" in field:
+        if "transform" not in field:
             continue
 
         for tx in field["transform"]:

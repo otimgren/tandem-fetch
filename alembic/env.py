@@ -4,15 +4,13 @@ import sys
 from logging.config import fileConfig
 from pathlib import Path
 
-from alembic import context
 from alembic.ddl.impl import DefaultImpl
 from sqlalchemy import create_engine, pool
 
+from alembic import context
+
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
-
-from tandem_fetch.db.base import Base
-from tandem_fetch.definitions import DATABASE_URL
 
 # Import all models to ensure they are registered with Base.metadata
 from tandem_fetch.db import (  # noqa: F401
@@ -21,6 +19,8 @@ from tandem_fetch.db import (  # noqa: F401
     Event,
     RawEvent,
 )
+from tandem_fetch.db.base import Base
+from tandem_fetch.definitions import DATABASE_URL
 
 
 class AlembicDuckDBImpl(DefaultImpl):

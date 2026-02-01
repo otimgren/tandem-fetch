@@ -2,14 +2,14 @@ from dataclasses import asdict
 
 import polars as pl
 
+from tandem_fetch import credentials, tsource
+
 pl.Config.set_fmt_str_lengths(1000)
 pl.Config.set_tbl_rows(100)
 
-from tandem_fetch import credentials, tsource
-
 
 def main() -> None:
-    print(f"Hello from tandem-fetch!")
+    print("Hello from tandem-fetch!")
     creds = credentials.TConnectCredentials.get_credentials()
     api = tsource.TSourceAPI(credentials=creds)
     pumper_info = api.get_pumper_info()

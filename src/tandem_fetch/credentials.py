@@ -1,9 +1,8 @@
 """Helpers for getting credentials for Tandem Connect."""
 
+import tomllib
 from dataclasses import dataclass
 from typing import Self
-
-import tomllib
 
 from tandem_fetch import definitions
 

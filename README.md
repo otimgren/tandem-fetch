@@ -14,7 +14,24 @@ uv sync
 
 That's it! No database server installation required - data is stored in a local DuckDB file.
 
-### 2. Configure Credentials
+### 2. Set Up Pre-Commit Hooks (Recommended)
+
+Install pre-commit hooks to automatically format code and detect secrets:
+
+```bash
+uv tool install prek
+prek install
+```
+
+This ensures code quality and prevents accidentally committing sensitive data. See [Pre-Commit Hooks Guide](specs/002-precommit-hooks/quickstart.md) for details.
+
+**Bypass hooks** (for exceptional cases only):
+```bash
+SKIP=hook-id git commit  # Skip specific hook
+git commit --no-verify   # Skip all hooks (use sparingly)
+```
+
+### 3. Configure Credentials
 
 ```bash
 cp sensitive/credentials.template.toml sensitive/credentials.toml

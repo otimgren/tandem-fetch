@@ -1,9 +1,9 @@
 import json
 
 try:
-    from static_dicts import ALERTS_DICT, ALARMS_DICT, CGM_ALERTS_DICT
+    from static_dicts import ALARMS_DICT, ALERTS_DICT, CGM_ALERTS_DICT
 except ImportError:
-    from .static_dicts import ALERTS_DICT, ALARMS_DICT, CGM_ALERTS_DICT
+    from .static_dicts import ALARMS_DICT, ALERTS_DICT, CGM_ALERTS_DICT
 
 
 def enumNameFormat(text):
@@ -54,12 +54,12 @@ def transform_enum(event_def, name, name_fmt, field, tx):
     out += [
         "@property",
         f"def {name_fmt}(self):",
-        f"    try:",
+        "    try:",
         f"        return self.{enumNameFormat(name_fmt)}Enum(self.{name_fmt}Raw)",
-        f"    except ValueError as e:",
+        "    except ValueError as e:",
         f'        logger.error("Invalid {name_fmt}Raw in {enumNameFormat(name_fmt)} for "+str(self))',
-        f"        logger.error(e)",
-        f"        return None",
+        "        logger.error(e)",
+        "        return None",
         "",
     ]
 
@@ -92,13 +92,13 @@ def transform_bitmask(event_def, name, name_fmt, field, tx):
     out += [
         "@property",
         f"def {name_fmt}(self):",
-        f"    try:",
+        "    try:",
         f"        return self.{enumNameFormat(name_fmt)}Bitmask(self.{name_fmt}Raw)",
-        f"    except ValueError as e:",
+        "    except ValueError as e:",
         f'        logger.error("Invalid {name_fmt}Raw in {enumNameFormat(name_fmt)}Bitmask for "+str(self))',
-        f"        logger.error(e)",
-        f"        return None",
-        f"",
+        "        logger.error(e)",
+        "        return None",
+        "",
     ]
 
     return out

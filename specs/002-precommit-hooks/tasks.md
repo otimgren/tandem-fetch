@@ -77,16 +77,16 @@
 
 ### Implementation for User Story 2
 
-- [ ] T016 [US2] Configure `.gitleaks.toml` with [extend] section and useDefault=true
-- [ ] T017 [US2] Add [allowlist] section to .gitleaks.toml with paths for test directories: '''.*/tests/fixtures/.*'''
-- [ ] T018 [US2] Add gitleaks repository to .pre-commit-config.yaml with rev v8.24.3
-- [ ] T019 [US2] Add gitleaks hook to .pre-commit-config.yaml
-- [ ] T020 [US2] Run `prek run gitleaks --all-files` to scan entire codebase for existing secrets
-- [ ] T021 [US2] If secrets found in T020, add to .gitleaksignore or fix them before proceeding
-- [ ] T022 [US2] Validate SC-002: Verify no secrets exist with `git log -p | gitleaks detect --no-git`
-- [ ] T023 [US2] Validate SC-004: Create test file with fake API key, attempt commit, verify clear error message
-- [ ] T024 [US2] Validate SC-005: Test false positive handling by adding allowlist pattern to .gitleaks.toml
-- [ ] T025 [US2] Validate SC-006: Attempt to commit file in sensitive/ directory, verify blocked
+- [x] T016 [US2] Configure `.gitleaks.toml` with [extend] section and useDefault=true
+- [x] T017 [US2] Add [allowlist] section to .gitleaks.toml with paths for test directories: '''.*/tests/fixtures/.*'''
+- [x] T018 [US2] Add gitleaks repository to .pre-commit-config.yaml with rev v8.24.3
+- [x] T019 [US2] Add gitleaks hook to .pre-commit-config.yaml
+- [x] T020 [US2] Run `prek run gitleaks --all-files` to scan entire codebase for existing secrets
+- [x] T021 [US2] If secrets found in T020, add to .gitleaksignore or fix them before proceeding
+- [x] T022 [US2] Validate SC-002: Verify no secrets exist with `git log -p | gitleaks detect --no-git`
+- [x] T023 [US2] Validate SC-004: Create test file with fake API key, attempt commit, verify clear error message
+- [x] T024 [US2] Validate SC-005: Test false positive handling by adding allowlist pattern to .gitleaks.toml
+- [x] T025 [US2] Validate SC-006: Attempt to commit file in sensitive/ directory, verify blocked
 
 **Checkpoint**: User Story 2 complete - secret detection working
 
@@ -100,22 +100,22 @@
 
 ### Implementation for User Story 3
 
-- [ ] T026 [P] [US3] Add builtin repository to .pre-commit-config.yaml with repo: builtin
-- [ ] T027 [P] [US3] Add trailing-whitespace hook to .pre-commit-config.yaml with args: ['--markdown-linebreak-ext=md']
-- [ ] T028 [P] [US3] Add end-of-file-fixer hook to .pre-commit-config.yaml
-- [ ] T029 [P] [US3] Add mixed-line-ending hook to .pre-commit-config.yaml with args: ['--fix=lf']
-- [ ] T030 [P] [US3] Add check-yaml hook to .pre-commit-config.yaml
-- [ ] T031 [P] [US3] Add check-toml hook to .pre-commit-config.yaml
-- [ ] T032 [P] [US3] Add check-json hook to .pre-commit-config.yaml
-- [ ] T033 [P] [US3] Add check-added-large-files hook to .pre-commit-config.yaml with args: ['--maxkb=1000']
-- [ ] T034 [P] [US3] Add check-case-conflict hook to .pre-commit-config.yaml
-- [ ] T035 [P] [US3] Add check-merge-conflict hook to .pre-commit-config.yaml
-- [ ] T036 [US3] Run `prek run --all-files` to apply all builtin hooks to entire codebase
-- [ ] T037 [US3] Commit any auto-fixed files with message "Apply code quality fixes (whitespace, line endings)"
-- [ ] T038 [US3] Validate SC-007: Create malformed TOML file in tests/, attempt commit, verify blocked
-- [ ] T039 [US3] Validate acceptance scenario 1: Create file with unsorted imports, verify auto-sort
-- [ ] T040 [US3] Validate acceptance scenario 2: Create file with trailing whitespace, verify removal
-- [ ] T041 [US3] Validate acceptance scenario 3: Create file with CRLF line endings, verify normalization to LF
+- [x] T026 [P] [US3] Add builtin repository to .pre-commit-config.yaml with repo: builtin
+- [x] T027 [P] [US3] Add trailing-whitespace hook to .pre-commit-config.yaml with args: ['--markdown-linebreak-ext=md']
+- [x] T028 [P] [US3] Add end-of-file-fixer hook to .pre-commit-config.yaml
+- [x] T029 [P] [US3] Add mixed-line-ending hook to .pre-commit-config.yaml with args: ['--fix=lf']
+- [x] T030 [P] [US3] Add check-yaml hook to .pre-commit-config.yaml
+- [x] T031 [P] [US3] Add check-toml hook to .pre-commit-config.yaml
+- [x] T032 [P] [US3] Add check-json hook to .pre-commit-config.yaml
+- [x] T033 [P] [US3] Add check-added-large-files hook to .pre-commit-config.yaml with args: ['--maxkb=1000']
+- [x] T034 [P] [US3] Add check-case-conflict hook to .pre-commit-config.yaml
+- [x] T035 [P] [US3] Add check-merge-conflict hook to .pre-commit-config.yaml
+- [x] T036 [US3] Run `prek run --all-files` to apply all builtin hooks to entire codebase
+- [x] T037 [US3] Commit any auto-fixed files with message "Apply code quality fixes (whitespace, line endings)"
+- [x] T038 [US3] Validate SC-007: Create malformed TOML file in tests/, attempt commit, verify blocked
+- [x] T039 [US3] Validate acceptance scenario 1: Create file with unsorted imports, verify auto-sort
+- [x] T040 [US3] Validate acceptance scenario 2: Create file with trailing whitespace, verify removal
+- [x] T041 [US3] Validate acceptance scenario 3: Create file with CRLF line endings, verify normalization to LF
 
 **Checkpoint**: User Story 3 complete - all code quality checks working
 

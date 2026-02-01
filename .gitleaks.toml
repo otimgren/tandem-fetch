@@ -10,4 +10,5 @@ useDefault = true
 description = "Allowlist for known false positives"
 paths = [
   '''.*/tests/fixtures/.*''',  # Exclude test fixture files
+  '''docs/pre-commit-hooks\.md''',  # Documentation with example secrets
 ]

@@ -42,8 +42,9 @@ def get_all_raw_pump_events_flow():
     """Get and write to the DB all raw pump events from T:Connect."""
     api = auth.log_in_to_tsource()
 
-    start = _get_latest_updated_at() or datetime.datetime(2020, 1, 1)
-    end = datetime.datetime.now()
+    # Use timezone-aware datetimes (UTC) for consistency
+    start = _get_latest_updated_at() or datetime.datetime(2020, 1, 1, tzinfo=datetime.timezone.utc)
+    end = datetime.datetime.now(datetime.timezone.utc)
 
     # Need to use batches here as there is a limit to how many events can
     # be fetched at once - using 7-day batches

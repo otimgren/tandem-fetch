@@ -19,8 +19,9 @@ def populate_cgm_readings() -> None:
     with engine.connect() as conn:
         # DuckDB-compatible SQL - use json_extract_string for JSON access
         query = text("""
-            INSERT INTO cgm_readings (events_id, timestamp, cgm_reading)
+            INSERT INTO cgm_readings (id, events_id, timestamp, cgm_reading)
             SELECT
+                nextval('cgm_readings_id_seq'),
                 e.id,
                 e.timestamp,
                 CAST(json_extract_string(e.event_data, '$.currentglucosedisplayvalue') AS INTEGER)

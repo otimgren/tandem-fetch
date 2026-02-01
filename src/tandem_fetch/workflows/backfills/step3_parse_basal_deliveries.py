@@ -20,6 +20,7 @@ def populate_basal_deliveries() -> None:
         # DuckDB-compatible SQL - use json_extract_string for JSON access
         query = text("""
             INSERT INTO basal_deliveries (
+                id,
                 events_id,
                 timestamp,
                 profile_basal_rate,
@@ -27,6 +28,7 @@ def populate_basal_deliveries() -> None:
                 temp_basal_rate
             )
             SELECT
+                nextval('basal_deliveries_id_seq'),
                 e.id,
                 e.timestamp,
                 CAST(json_extract_string(e.event_data, '$.profileBasalRate') AS INTEGER),

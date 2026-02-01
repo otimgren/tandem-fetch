@@ -17,18 +17,18 @@ def populate_cgm_readings() -> None:
     engine = create_engine(DATABASE_URL)
 
     with engine.connect() as conn:
-        # Raw SQL approach - direct INSERT...SELECT
+        # DuckDB-compatible SQL - use json_extract_string for JSON access
         query = text("""
             INSERT INTO cgm_readings (events_id, timestamp, cgm_reading)
             SELECT
                 e.id,
                 e.timestamp,
-                CAST(e.event_data->>'currentglucosedisplayvalue' AS INTEGER)
+                CAST(json_extract_string(e.event_data, '$.currentglucosedisplayvalue') AS INTEGER)
             FROM events e
             LEFT JOIN cgm_readings cgm ON cgm.events_id = e.id
             WHERE cgm.id IS NULL
             AND e.event_name LIKE 'LID_CGM_DATA%'
-            AND e.event_data->>'currentglucosedisplayvalue' IS NOT NULL
+            AND json_extract_string(e.event_data, '$.currentglucosedisplayvalue') IS NOT NULL
         """)
 
         result = conn.execute(query)

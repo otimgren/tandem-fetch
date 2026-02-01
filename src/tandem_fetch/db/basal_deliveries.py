@@ -1,12 +1,21 @@
-from sqlalchemy import Column, DateTime, ForeignKey, Integer
+"""SQLAlchemy models for basal deliveries."""
+
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, Sequence
 
 from tandem_fetch.db.base import Base
 
 
 class BasalDelivery(Base):
+    """Model for storing basal delivery data."""
+
     __tablename__ = "basal_deliveries"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(
+        Integer,
+        Sequence("basal_deliveries_id_seq"),
+        primary_key=True,
+        autoincrement=True,
+    )
     events_id = Column(
         Integer, ForeignKey("events.id"), nullable=False, unique=True
     )
@@ -14,4 +23,3 @@ class BasalDelivery(Base):
     profile_basal_rate = Column(Integer)
     algorithm_basal_rate = Column(Integer)
     temp_basal_rate = Column(Integer)
-

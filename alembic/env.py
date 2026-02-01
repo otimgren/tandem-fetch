@@ -1,37 +1,47 @@
-import os
+"""Alembic environment configuration for DuckDB."""
+
 import sys
 from logging.config import fileConfig
-
-import dotenv
-from sqlalchemy import engine_from_config, pool
+from pathlib import Path
 
 from alembic import context
-from tandem_fetch.db.base import Base
+from alembic.ddl.impl import DefaultImpl
+from sqlalchemy import create_engine, pool
 
-dotenv.load_dotenv()
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+# Add project root to path
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+from tandem_fetch.db.base import Base
+from tandem_fetch.definitions import DATABASE_URL
+
+# Import all models to ensure they are registered with Base.metadata
+from tandem_fetch.db import (  # noqa: F401
+    BasalDelivery,
+    CgmReading,
+    Event,
+    RawEvent,
+)
+
+
+class AlembicDuckDBImpl(DefaultImpl):
+    """Alembic implementation for DuckDB dialect."""
+
+    __dialect__ = "duckdb"
+
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
-db_url = os.getenv("DATABASE_URL")
-if db_url:
-    config.set_main_option("sqlalchemy.url", db_url)
+
+# Set the database URL from definitions
+config.set_main_option("sqlalchemy.url", DATABASE_URL)
 
 # Interpret the config file for Python logging.
-# This line sets up loggers basically.
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# add your model's MetaData object here
-# for 'autogenerate' support
+# add your model's MetaData object here for 'autogenerate' support
 target_metadata = Base.metadata
-
-
-# other values from the config, defined by the needs of env.py,
-# can be acquired:
-# my_important_option = config.get_main_option("my_important_option")
-# ... etc.
 
 
 def run_migrations_offline() -> None:
@@ -39,12 +49,11 @@ def run_migrations_offline() -> None:
 
     This configures the context with just a URL
     and not an Engine, though an Engine is acceptable
-    here as well.  By skipping the Engine creation
+    here as well. By skipping the Engine creation
     we don't even need a DBAPI to be available.
 
     Calls to context.execute() here emit the given string to the
     script output.
-
     """
     url = config.get_main_option("sqlalchemy.url")
     context.configure(
@@ -63,18 +72,15 @@ def run_migrations_online() -> None:
 
     In this scenario we need to create an Engine
     and associate a connection with the context.
-
     """
-    connectable = engine_from_config(
-        config.get_section(config.config_ini_section, {}),
-        prefix="sqlalchemy.",
+    # Create engine directly with DuckDB URL
+    connectable = create_engine(
+        DATABASE_URL,
         poolclass=pool.NullPool,
     )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()

@@ -6,7 +6,8 @@
       "Bash(.specify/scripts/bash/setup-plan.sh:*)",
       "WebSearch",
       "WebFetch(domain:duckdb.org)",
-      "Bash(.specify/scripts/bash/check-prerequisites.sh:*)"
+      "Bash(.specify/scripts/bash/check-prerequisites.sh:*)",
+      "Bash(uv sync:*)"
     ]
   }
 }

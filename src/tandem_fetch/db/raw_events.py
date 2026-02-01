@@ -2,7 +2,7 @@
 
 from typing import final, override
 
-from sqlalchemy import JSON, Column, DateTime, Integer
+from sqlalchemy import JSON, Column, DateTime, Integer, Sequence
 from sqlalchemy.sql import func
 
 from tandem_fetch.db.base import Base
@@ -21,7 +21,9 @@ class RawEvent(Base):
 
     __tablename__ = "raw_events"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(
+        Integer, Sequence("raw_events_id_seq"), primary_key=True, autoincrement=True
+    )
     created = Column(DateTime, default=func.now(), nullable=False)
     raw_event_data = Column(JSON, nullable=False)
 

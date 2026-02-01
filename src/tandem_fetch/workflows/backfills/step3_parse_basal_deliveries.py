@@ -17,7 +17,7 @@ def populate_basal_deliveries() -> None:
     engine = create_engine(DATABASE_URL)
 
     with engine.connect() as conn:
-        # Raw SQL approach - direct INSERT...SELECT
+        # DuckDB-compatible SQL - use json_extract_string for JSON access
         query = text("""
             INSERT INTO basal_deliveries (
                 events_id,
@@ -29,12 +29,12 @@ def populate_basal_deliveries() -> None:
             SELECT
                 e.id,
                 e.timestamp,
-                CAST(e.event_data->>'profileBasalRate' AS INTEGER),
-                CAST(e.event_data->>'algorithmRate' AS INTEGER),
-                CAST(e.event_data->>'tempRate' AS INTEGER)
+                CAST(json_extract_string(e.event_data, '$.profileBasalRate') AS INTEGER),
+                CAST(json_extract_string(e.event_data, '$.algorithmRate') AS INTEGER),
+                CAST(json_extract_string(e.event_data, '$.tempRate') AS INTEGER)
             FROM events e
-            LEFT JOIN basal_deliveries cgm ON cgm.events_id = e.id
-            WHERE cgm.id IS NULL
+            LEFT JOIN basal_deliveries bd ON bd.events_id = e.id
+            WHERE bd.id IS NULL
             AND e.event_name LIKE 'LID_BASAL_DELIVERY%'
         """)
 
@@ -48,7 +48,7 @@ def populate_basal_deliveries() -> None:
 
 @flow
 def populate_basal_deliveries_flow() -> None:
-    """Populate the CGM readings table."""
+    """Populate the basal deliveries table."""
     logger.info("Start populating basal deliveries")
 
     populate_basal_deliveries()

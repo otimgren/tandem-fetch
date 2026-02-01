@@ -12,3 +12,6 @@ wheels/
 # Sensitive info
 sensitive/credentials.toml
 .env
+
+# Database
+data/

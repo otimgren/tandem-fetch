@@ -1,13 +1,13 @@
 """Workflow to get and write to the DB all raw pump events from T:Connect."""
 
 import datetime
-from venv import logger
 
+from loguru import logger
 from prefect import flow
 from sqlalchemy import create_engine, func
 from sqlalchemy.orm import sessionmaker
 
-from tandem_fetch.db.raw_events.models import RawEvent
+from tandem_fetch.db.raw_events import RawEvent
 from tandem_fetch.definitions import DATABASE_URL
 from tandem_fetch.tasks import auth, fetch, raw_events
 

@@ -8,7 +8,7 @@ from prefect import task
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from tandem_fetch.db.raw_events.models import RawEvent
+from tandem_fetch.db.raw_events import RawEvent
 from tandem_fetch.definitions import DATABASE_URL
 from tandem_fetch.pump_events.events import BaseEvent
 

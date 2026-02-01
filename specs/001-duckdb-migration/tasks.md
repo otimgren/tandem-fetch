@@ -25,10 +25,10 @@
 
 **Purpose**: Update dependencies and create directory structure
 
-- [ ] T001 Update pyproject.toml: remove `psycopg2>=2.9.10`, add `duckdb>=1.0.0` and `duckdb-engine>=0.17.0`
-- [ ] T002 Run `uv sync` to update lock file and install new dependencies
-- [ ] T003 Create `data/` directory at repository root for DuckDB file
-- [ ] T004 Add `data/` to .gitignore to exclude database file from version control
+- [x] T001 Update pyproject.toml: remove `psycopg2>=2.9.10`, add `duckdb>=1.0.0` and `duckdb-engine>=0.17.0`
+- [x] T002 Run `uv sync` to update lock file and install new dependencies
+- [x] T003 Create `data/` directory at repository root for DuckDB file
+- [x] T004 Add `data/` to .gitignore to exclude database file from version control
 
 ---
 
@@ -40,21 +40,21 @@
 
 ### Database Configuration
 
-- [ ] T005 Update src/tandem_fetch/definitions.py: replace DATABASE_URL with DATABASE_PATH, default to `data/tandem.db`, generate DuckDB connection string `duckdb:///data/tandem.db`
+- [x] T005 Update src/tandem_fetch/definitions.py: replace DATABASE_URL with DATABASE_PATH, default to `data/tandem.db`, generate DuckDB connection string `duckdb:///data/tandem.db`
 
 ### Model Updates (Add Sequences for Auto-increment)
 
-- [ ] T006 [P] Update src/tandem_fetch/db/raw_events.py: add `from sqlalchemy import Sequence` and change id column to use `Sequence('raw_events_id_seq')`
-- [ ] T007 [P] Update src/tandem_fetch/db/events.py: add `from sqlalchemy import Sequence` and change id column to use `Sequence('events_id_seq')`
-- [ ] T008 [P] Update src/tandem_fetch/db/cgm_readings.py: add `from sqlalchemy import Sequence` and change id column to use `Sequence('cgm_readings_id_seq')`
-- [ ] T009 [P] Update src/tandem_fetch/db/basal_deliveries.py: add `from sqlalchemy import Sequence` and change id column to use `Sequence('basal_deliveries_id_seq')`
+- [x] T006 [P] Update src/tandem_fetch/db/raw_events.py: add `from sqlalchemy import Sequence` and change id column to use `Sequence('raw_events_id_seq')`
+- [x] T007 [P] Update src/tandem_fetch/db/events.py: add `from sqlalchemy import Sequence` and change id column to use `Sequence('events_id_seq')`
+- [x] T008 [P] Update src/tandem_fetch/db/cgm_readings.py: add `from sqlalchemy import Sequence` and change id column to use `Sequence('cgm_readings_id_seq')`
+- [x] T009 [P] Update src/tandem_fetch/db/basal_deliveries.py: add `from sqlalchemy import Sequence` and change id column to use `Sequence('basal_deliveries_id_seq')`
 
 ### Alembic Configuration
 
-- [ ] T010 Update alembic/env.py: add `AlembicDuckDBImpl` class with `__dialect__ = "duckdb"`, update URL handling to use DATABASE_PATH from definitions
-- [ ] T011 Update alembic.ini: set sqlalchemy.url placeholder (will be overridden by env.py)
-- [ ] T012 Delete all existing migration files in alembic/versions/
-- [ ] T013 Generate fresh initial migration with `alembic revision --autogenerate -m "initial_duckdb_schema"`
+- [x] T010 Update alembic/env.py: add `AlembicDuckDBImpl` class with `__dialect__ = "duckdb"`, update URL handling to use DATABASE_PATH from definitions
+- [x] T011 Update alembic.ini: set sqlalchemy.url placeholder (will be overridden by env.py)
+- [x] T012 Delete all existing migration files in alembic/versions/
+- [x] T013 Generate fresh initial migration with `alembic revision --autogenerate -m "initial_duckdb_schema"`
 
 **Checkpoint**: Foundation ready - database configured for DuckDB, user story implementation can now begin
 
@@ -68,15 +68,15 @@
 
 ### Implementation for User Story 1
 
-- [ ] T014 [US1] Update src/tandem_fetch/tasks/raw_events.py: change engine creation to use DuckDB connection string from definitions.py
-- [ ] T015 [US1] Update src/tandem_fetch/workflows/get_all_raw_pump_events.py: change engine creation to use DuckDB connection string from definitions.py
-- [ ] T016 [P] [US1] Update src/tandem_fetch/workflows/backfills/0_get_all_raw_pump_events.py: change engine creation to use DuckDB connection string
-- [ ] T017 [P] [US1] Update src/tandem_fetch/workflows/backfills/1_parse_events_table.py: change engine creation to use DuckDB connection string
-- [ ] T018 [P] [US1] Update src/tandem_fetch/workflows/backfills/2_parse_cgm_readings.py: change engine creation to use DuckDB connection string
-- [ ] T019 [P] [US1] Update src/tandem_fetch/workflows/backfills/3_parse_basal_deliveries.py: change engine creation to use DuckDB connection string
-- [ ] T020 [US1] Run `alembic upgrade head` to create schema in data/tandem.db
-- [ ] T021 [US1] Validate: run `uv run get-all-raw-pump-events` and verify raw events are stored
-- [ ] T022 [US1] Validate: run backfill workflows (1, 2, 3) and verify events, cgm_readings, basal_deliveries tables are populated
+- [x] T014 [US1] Update src/tandem_fetch/tasks/raw_events.py: change engine creation to use DuckDB connection string from definitions.py
+- [x] T015 [US1] Update src/tandem_fetch/workflows/get_all_raw_pump_events.py: change engine creation to use DuckDB connection string from definitions.py
+- [x] T016 [P] [US1] Update src/tandem_fetch/workflows/backfills/0_get_all_raw_pump_events.py: change engine creation to use DuckDB connection string
+- [x] T017 [P] [US1] Update src/tandem_fetch/workflows/backfills/1_parse_events_table.py: change engine creation to use DuckDB connection string
+- [x] T018 [P] [US1] Update src/tandem_fetch/workflows/backfills/2_parse_cgm_readings.py: change engine creation to use DuckDB connection string
+- [x] T019 [P] [US1] Update src/tandem_fetch/workflows/backfills/3_parse_basal_deliveries.py: change engine creation to use DuckDB connection string
+- [x] T020 [US1] Run `alembic upgrade head` to create schema in data/tandem.db
+- [ ] T021 [US1] Validate: run `uv run get-all-raw-pump-events` and verify raw events are stored (MANUAL - requires Tandem credentials)
+- [ ] T022 [US1] Validate: run backfill workflows (1, 2, 3) and verify events, cgm_readings, basal_deliveries tables are populated (MANUAL - requires data)
 
 **Checkpoint**: User Story 1 complete - data fetch and full pipeline working with DuckDB
 
@@ -90,10 +90,10 @@
 
 ### Implementation for User Story 2
 
-- [ ] T023 [US2] Validate: install DuckDB CLI (`brew install duckdb` or download) and connect to data/tandem.db
-- [ ] T024 [US2] Validate: run sample analytical query (daily CGM averages) in DuckDB CLI to verify data access
-- [ ] T025 [US2] Validate: run time-in-range calculation query to verify aggregations work
-- [ ] T026 [US2] Validate: export cgm_readings to Parquet using `COPY cgm_readings TO 'exports/cgm_readings.parquet' (FORMAT PARQUET)`
+- [ ] T023 [US2] Validate: install DuckDB CLI (`brew install duckdb` or download) and connect to data/tandem.db (MANUAL - requires data)
+- [ ] T024 [US2] Validate: run sample analytical query (daily CGM averages) in DuckDB CLI to verify data access (MANUAL - requires data)
+- [ ] T025 [US2] Validate: run time-in-range calculation query to verify aggregations work (MANUAL - requires data)
+- [ ] T026 [US2] Validate: export cgm_readings to Parquet using `COPY cgm_readings TO 'exports/cgm_readings.parquet' (FORMAT PARQUET)` (MANUAL - requires data)
 
 **Checkpoint**: User Story 2 complete - data queryable with standard SQL tools
 
@@ -107,11 +107,11 @@
 
 ### Implementation for User Story 3
 
-- [ ] T027 [US3] Update README.md: remove all PostgreSQL setup instructions (install PostgreSQL, create database, configure connection string)
-- [ ] T028 [US3] Update README.md: simplify setup to single `uv sync` step
-- [ ] T029 [US3] Update README.md: update usage examples to reflect new workflow (no alembic init needed, database auto-creates)
-- [ ] T030 [US3] Update README.md: add DuckDB CLI query examples for analytics
-- [ ] T031 [US3] Validate: verify database file is auto-created when running fetch command on fresh setup (delete data/tandem.db, run fetch)
+- [x] T027 [US3] Update README.md: remove all PostgreSQL setup instructions (install PostgreSQL, create database, configure connection string)
+- [x] T028 [US3] Update README.md: simplify setup to single `uv sync` step
+- [x] T029 [US3] Update README.md: update usage examples to reflect new workflow (no alembic init needed, database auto-creates)
+- [x] T030 [US3] Update README.md: add DuckDB CLI query examples for analytics
+- [ ] T031 [US3] Validate: verify database file is auto-created when running fetch command on fresh setup (MANUAL - requires Tandem credentials)
 
 **Checkpoint**: User Story 3 complete - zero database server setup required
 
@@ -121,12 +121,12 @@
 
 **Purpose**: Final validation and cleanup
 
-- [ ] T032 Validate SC-001: confirm only `uv sync` is needed for setup (no database server)
-- [ ] T033 Validate SC-002: confirm all pipeline stages (raw → events → cgm/basal) complete with DuckDB
-- [ ] T034 Validate SC-004: confirm analytical queries work in DuckDB CLI
-- [ ] T035 Validate SC-005: copy data/tandem.db to different location, open with DuckDB CLI, verify data accessible
-- [ ] T036 Validate SC-006: review README and confirm setup instructions reduced to 1 step
-- [ ] T037 Run quickstart.md validation: follow quickstart guide end-to-end on current setup
+- [x] T032 Validate SC-001: confirm only `uv sync` is needed for setup (no database server)
+- [ ] T033 Validate SC-002: confirm all pipeline stages (raw → events → cgm/basal) complete with DuckDB (MANUAL - requires Tandem credentials)
+- [ ] T034 Validate SC-004: confirm analytical queries work in DuckDB CLI (MANUAL - requires data)
+- [ ] T035 Validate SC-005: copy data/tandem.db to different location, open with DuckDB CLI, verify data accessible (MANUAL - requires data)
+- [x] T036 Validate SC-006: review README and confirm setup instructions reduced to 1 step
+- [ ] T037 Run quickstart.md validation: follow quickstart guide end-to-end on current setup (MANUAL - requires Tandem credentials)
 
 ---
 

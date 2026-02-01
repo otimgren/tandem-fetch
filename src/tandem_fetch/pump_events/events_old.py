@@ -9,41 +9,45 @@ logger = logging.getLogger(__name__)
 
 EVENT_LEN = 26
 
+
 @dataclass
 class BaseEvent:
     @staticmethod
     def build(raw):
         raise NotImplemented
 
-UINT8 = '>B'
-INT8 = '>b'
-UINT16 = '>H'
-INT16 = '>h'
-UINT32 = '>I'
-FLOAT32 = '>f'
+
+UINT8 = ">B"
+INT8 = ">b"
+UINT16 = ">H"
+INT16 = ">h"
+UINT32 = ">I"
+FLOAT32 = ">f"
+
 
 @dataclass
 class LidBasalRateChange(BaseEvent):
     """3: LID_BASAL_RATE_CHANGE"""
+
     ID = 3
     NAME = "LID_BASAL_RATE_CHANGE"
 
     raw: RawEvent
-    commandedbasalrate: float # units/hour
-    basebasalrate: float # units/hour
-    maxbasalrate: float # units/hour
+    commandedbasalrate: float  # units/hour
+    basebasalrate: float  # units/hour
+    maxbasalrate: float  # units/hour
     IDP: int
     changetypeRaw: int
 
     ChangetypeMap = {
-        "0": "\"timed segment\" - change by timed segment (because either the segment advanced based on time, the user changed the pump time, the user changed the active segment or changed by an AID algorithm.)",
-        "1": "\"new profile\" - change by activation of new profile",
-        "2": "\"temp rate start\"",
-        "3": "\"temp rate end\"",
-        "4": "\"pump suspended\"",
-        "5": "\"pump resumed\"",
+        "0": '"timed segment" - change by timed segment (because either the segment advanced based on time, the user changed the pump time, the user changed the active segment or changed by an AID algorithm.)',
+        "1": '"new profile" - change by activation of new profile',
+        "2": '"temp rate start"',
+        "3": '"temp rate end"',
+        "4": '"pump suspended"',
+        "5": '"pump resumed"',
         "6": "\u201cpump shut down\u201d",
-        "7": "\u201cbasal limit\u201d"
+        "7": "\u201cbasal limit\u201d",
     }
 
     class ChangetypeBitmask(IntFlag):
@@ -61,25 +65,25 @@ class LidBasalRateChange(BaseEvent):
         try:
             return self.ChangetypeBitmask(self.changetypeRaw)
         except ValueError as e:
-            logger.error("Invalid changetypeRaw in ChangetypeBitmask for "+str(self))
+            logger.error("Invalid changetypeRaw in ChangetypeBitmask for " + str(self))
             logger.error(e)
             return None
 
     @staticmethod
     def build(raw):
-        commandedbasalrate, = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 10)
-        basebasalrate, = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 14)
-        maxbasalrate, = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 18)
-        IDP, = struct.unpack_from(UINT16, raw[:EVENT_LEN], 24)
-        changetype, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 23)
+        (commandedbasalrate,) = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 10)
+        (basebasalrate,) = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 14)
+        (maxbasalrate,) = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 18)
+        (IDP,) = struct.unpack_from(UINT16, raw[:EVENT_LEN], 24)
+        (changetype,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 23)
 
         return LidBasalRateChange(
-            raw = RawEvent.build(raw),
-            commandedbasalrate = commandedbasalrate,
-            basebasalrate = basebasalrate,
-            maxbasalrate = maxbasalrate,
-            IDP = IDP,
-            changetypeRaw = changetype,
+            raw=RawEvent.build(raw),
+            commandedbasalrate=commandedbasalrate,
+            basebasalrate=basebasalrate,
+            maxbasalrate=maxbasalrate,
+            IDP=IDP,
+            changetypeRaw=changetype,
         )
 
     @property
@@ -94,6 +98,7 @@ class LidBasalRateChange(BaseEvent):
 @dataclass
 class LidAlertActivated(BaseEvent):
     """4: LID_ALERT_ACTIVATED"""
+
     ID = 4
     NAME = "LID_ALERT_ACTIVATED"
 
@@ -166,7 +171,7 @@ class LidAlertActivated(BaseEvent):
         "60": "DEFAULT_ALERT_60",
         "61": "DEFAULT_ALERT_61",
         "62": "DEFAULT_ALERT_62",
-        "63": "DEFAULT_ALERT_63"
+        "63": "DEFAULT_ALERT_63",
     }
 
     class AlertidEnum(Enum):
@@ -239,23 +244,23 @@ class LidAlertActivated(BaseEvent):
         try:
             return self.AlertidEnum(self.alertidRaw)
         except ValueError as e:
-            logger.error("Invalid alertidRaw in Alertid for "+str(self))
+            logger.error("Invalid alertidRaw in Alertid for " + str(self))
             logger.error(e)
             return None
 
     @staticmethod
     def build(raw):
-        alertid, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
-        faultlocatordata, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 14)
-        param1, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 18)
-        param2, = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 22)
+        (alertid,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
+        (faultlocatordata,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 14)
+        (param1,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 18)
+        (param2,) = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 22)
 
         return LidAlertActivated(
-            raw = RawEvent.build(raw),
-            alertidRaw = alertid,
-            faultlocatordata = faultlocatordata,
-            param1 = param1,
-            param2 = param2,
+            raw=RawEvent.build(raw),
+            alertidRaw=alertid,
+            faultlocatordata=faultlocatordata,
+            param1=param1,
+            param2=param2,
         )
 
     @property
@@ -270,6 +275,7 @@ class LidAlertActivated(BaseEvent):
 @dataclass
 class LidAlarmActivated(BaseEvent):
     """5: LID_ALARM_ACTIVATED"""
+
     ID = 5
     NAME = "LID_ALARM_ACTIVATED"
 
@@ -343,7 +349,7 @@ class LidAlarmActivated(BaseEvent):
         "60": "DEFAULT_ALARM_60",
         "61": "DEFAULT_ALARM_61",
         "62": "DEFAULT_ALARM_62",
-        "63": "DEFAULT_ALARM_63"
+        "63": "DEFAULT_ALARM_63",
     }
 
     class AlarmidEnum(Enum):
@@ -417,23 +423,23 @@ class LidAlarmActivated(BaseEvent):
         try:
             return self.AlarmidEnum(self.alarmidRaw)
         except ValueError as e:
-            logger.error("Invalid alarmidRaw in Alarmid for "+str(self))
+            logger.error("Invalid alarmidRaw in Alarmid for " + str(self))
             logger.error(e)
             return None
 
     @staticmethod
     def build(raw):
-        alarmid, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
-        faultlocatordata, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 14)
-        param1, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 18)
-        param2, = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 22)
+        (alarmid,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
+        (faultlocatordata,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 14)
+        (param1,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 18)
+        (param2,) = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 22)
 
         return LidAlarmActivated(
-            raw = RawEvent.build(raw),
-            alarmidRaw = alarmid,
-            faultlocatordata = faultlocatordata,
-            param1 = param1,
-            param2 = param2,
+            raw=RawEvent.build(raw),
+            alarmidRaw=alarmid,
+            faultlocatordata=faultlocatordata,
+            param1=param1,
+            param2=param2,
         )
 
     @property
@@ -448,6 +454,7 @@ class LidAlarmActivated(BaseEvent):
 @dataclass
 class LidMalfunctionActivated(BaseEvent):
     """6: LID_MALFUNCTION_ACTIVATED"""
+
     ID = 6
     NAME = "LID_MALFUNCTION_ACTIVATED"
 
@@ -460,17 +467,17 @@ class LidMalfunctionActivated(BaseEvent):
     # Dictionary unknown: malfs
     @staticmethod
     def build(raw):
-        malfid, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
-        faultlocatordata, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 14)
-        param1, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 18)
-        param2, = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 22)
+        (malfid,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
+        (faultlocatordata,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 14)
+        (param1,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 18)
+        (param2,) = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 22)
 
         return LidMalfunctionActivated(
-            raw = RawEvent.build(raw),
-            malfidRaw = malfid,
-            faultlocatordata = faultlocatordata,
-            param1 = param1,
-            param2 = param2,
+            raw=RawEvent.build(raw),
+            malfidRaw=malfid,
+            faultlocatordata=faultlocatordata,
+            param1=param1,
+            param2=param2,
         )
 
     @property
@@ -485,20 +492,21 @@ class LidMalfunctionActivated(BaseEvent):
 @dataclass
 class LidPumpingSuspended(BaseEvent):
     """11: LID_PUMPING_SUSPENDED"""
+
     ID = 11
     NAME = "LID_PUMPING_SUSPENDED"
 
     raw: RawEvent
     presuspendstate: int
-    insulinamount: int # units
+    insulinamount: int  # units
     suspendreasonRaw: int
-    rpatimeout: int # minutes
+    rpatimeout: int  # minutes
 
     SuspendreasonMap = {
         "0": "User Aborted",
         "1": "Terminated by Alarm",
         "2": "Terminated by Malfunction",
-        "6": "Auto Suspend by PLGS"
+        "6": "Auto Suspend by PLGS",
     }
 
     class SuspendreasonEnum(Enum):
@@ -512,23 +520,23 @@ class LidPumpingSuspended(BaseEvent):
         try:
             return self.SuspendreasonEnum(self.suspendreasonRaw)
         except ValueError as e:
-            logger.error("Invalid suspendreasonRaw in Suspendreason for "+str(self))
+            logger.error("Invalid suspendreasonRaw in Suspendreason for " + str(self))
             logger.error(e)
             return None
 
     @staticmethod
     def build(raw):
-        presuspendstate, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
-        insulinamount, = struct.unpack_from(UINT16, raw[:EVENT_LEN], 16)
-        suspendreason, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 15)
-        rpatimeout, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 14)
+        (presuspendstate,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
+        (insulinamount,) = struct.unpack_from(UINT16, raw[:EVENT_LEN], 16)
+        (suspendreason,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 15)
+        (rpatimeout,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 14)
 
         return LidPumpingSuspended(
-            raw = RawEvent.build(raw),
-            presuspendstate = presuspendstate,
-            insulinamount = insulinamount,
-            suspendreasonRaw = suspendreason,
-            rpatimeout = rpatimeout,
+            raw=RawEvent.build(raw),
+            presuspendstate=presuspendstate,
+            insulinamount=insulinamount,
+            suspendreasonRaw=suspendreason,
+            rpatimeout=rpatimeout,
         )
 
     @property
@@ -543,23 +551,23 @@ class LidPumpingSuspended(BaseEvent):
 @dataclass
 class LidPumpingResumed(BaseEvent):
     """12: LID_PUMPING_RESUMED"""
+
     ID = 12
     NAME = "LID_PUMPING_RESUMED"
 
     raw: RawEvent
     preresumestate: int
-    insulinamount: int # units
-
+    insulinamount: int  # units
 
     @staticmethod
     def build(raw):
-        preresumestate, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
-        insulinamount, = struct.unpack_from(UINT16, raw[:EVENT_LEN], 16)
+        (preresumestate,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
+        (insulinamount,) = struct.unpack_from(UINT16, raw[:EVENT_LEN], 16)
 
         return LidPumpingResumed(
-            raw = RawEvent.build(raw),
-            preresumestate = preresumestate,
-            insulinamount = insulinamount,
+            raw=RawEvent.build(raw),
+            preresumestate=preresumestate,
+            insulinamount=insulinamount,
         )
 
     @property
@@ -574,26 +582,26 @@ class LidPumpingResumed(BaseEvent):
 @dataclass
 class LidTimeChanged(BaseEvent):
     """13: LID_TIME_CHANGED"""
+
     ID = 13
     NAME = "LID_TIME_CHANGED"
 
     raw: RawEvent
-    timeprior: int # ms
-    timeafter: int # ms
-    rawrtctime: int # ms
-
+    timeprior: int  # ms
+    timeafter: int  # ms
+    rawrtctime: int  # ms
 
     @staticmethod
     def build(raw):
-        timeprior, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
-        timeafter, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 14)
-        rawrtctime, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 18)
+        (timeprior,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
+        (timeafter,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 14)
+        (rawrtctime,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 18)
 
         return LidTimeChanged(
-            raw = RawEvent.build(raw),
-            timeprior = timeprior,
-            timeafter = timeafter,
-            rawrtctime = rawrtctime,
+            raw=RawEvent.build(raw),
+            timeprior=timeprior,
+            timeafter=timeafter,
+            rawrtctime=rawrtctime,
         )
 
     @property
@@ -608,26 +616,26 @@ class LidTimeChanged(BaseEvent):
 @dataclass
 class LidDateChanged(BaseEvent):
     """14: LID_DATE_CHANGED"""
+
     ID = 14
     NAME = "LID_DATE_CHANGED"
 
     raw: RawEvent
-    dateprior: int # day
-    dateafter: int # day
-    rawrtctime: int # ms
-
+    dateprior: int  # day
+    dateafter: int  # day
+    rawrtctime: int  # ms
 
     @staticmethod
     def build(raw):
-        dateprior, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
-        dateafter, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 14)
-        rawrtctime, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 18)
+        (dateprior,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
+        (dateafter,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 14)
+        (rawrtctime,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 18)
 
         return LidDateChanged(
-            raw = RawEvent.build(raw),
-            dateprior = dateprior,
-            dateafter = dateafter,
-            rawrtctime = rawrtctime,
+            raw=RawEvent.build(raw),
+            dateprior=dateprior,
+            dateafter=dateafter,
+            rawrtctime=rawrtctime,
         )
 
     @property
@@ -642,23 +650,21 @@ class LidDateChanged(BaseEvent):
 @dataclass
 class LidBgReadingTaken(BaseEvent):
     """16: LID_BG_READING_TAKEN"""
+
     ID = 16
     NAME = "LID_BG_READING_TAKEN"
 
     raw: RawEvent
     selectediobRaw: int
-    BG: int # mg/dL
+    BG: int  # mg/dL
     bgentrytypeRaw: int
-    IOB: float # units
-    targetbg: int # mg/dL
-    ISF: int # (mg/dL)/unit
+    IOB: float  # units
+    targetbg: int  # mg/dL
+    ISF: int  # (mg/dL)/unit
     bgsourcetypeRaw: int
     cgmcalibrationRaw: int
 
-    SelectediobMap = {
-        "0": "Mudaliar IOB",
-        "1": "Swan IOB Meal"
-    }
+    SelectediobMap = {"0": "Mudaliar IOB", "1": "Swan IOB Meal"}
 
     class SelectediobEnum(Enum):
         MudaliarIob = 0
@@ -669,13 +675,13 @@ class LidBgReadingTaken(BaseEvent):
         try:
             return self.SelectediobEnum(self.selectediobRaw)
         except ValueError as e:
-            logger.error("Invalid selectediobRaw in Selectediob for "+str(self))
+            logger.error("Invalid selectediobRaw in Selectediob for " + str(self))
             logger.error(e)
             return None
 
     BgentrytypeMap = {
         "0": "Manual Entry by the User via Numpad",
-        "1": "Auto Populated BG using Dexcom EGV"
+        "1": "Auto Populated BG using Dexcom EGV",
     }
 
     class BgentrytypeEnum(Enum):
@@ -687,14 +693,11 @@ class LidBgReadingTaken(BaseEvent):
         try:
             return self.BgentrytypeEnum(self.bgentrytypeRaw)
         except ValueError as e:
-            logger.error("Invalid bgentrytypeRaw in Bgentrytype for "+str(self))
+            logger.error("Invalid bgentrytypeRaw in Bgentrytype for " + str(self))
             logger.error(e)
             return None
 
-    BgsourcetypeMap = {
-        "0": "Local Pump entry",
-        "1": "Remote entry"
-    }
+    BgsourcetypeMap = {"0": "Local Pump entry", "1": "Remote entry"}
 
     class BgsourcetypeEnum(Enum):
         LocalPumpEntry = 0
@@ -705,13 +708,13 @@ class LidBgReadingTaken(BaseEvent):
         try:
             return self.BgsourcetypeEnum(self.bgsourcetypeRaw)
         except ValueError as e:
-            logger.error("Invalid bgsourcetypeRaw in Bgsourcetype for "+str(self))
+            logger.error("Invalid bgsourcetypeRaw in Bgsourcetype for " + str(self))
             logger.error(e)
             return None
 
     CgmcalibrationMap = {
         "0": "No, it was not used to Calibrate.",
-        "1": "Yes, it was used to calibrate."
+        "1": "Yes, it was used to calibrate.",
     }
 
     class CgmcalibrationEnum(Enum):
@@ -723,31 +726,31 @@ class LidBgReadingTaken(BaseEvent):
         try:
             return self.CgmcalibrationEnum(self.cgmcalibrationRaw)
         except ValueError as e:
-            logger.error("Invalid cgmcalibrationRaw in Cgmcalibration for "+str(self))
+            logger.error("Invalid cgmcalibrationRaw in Cgmcalibration for " + str(self))
             logger.error(e)
             return None
 
     @staticmethod
     def build(raw):
-        selectediob, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 25)
-        BG, = struct.unpack_from(UINT16, raw[:EVENT_LEN], 12)
-        bgentrytype, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 10)
-        IOB, = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 14)
-        targetbg, = struct.unpack_from(UINT16, raw[:EVENT_LEN], 20)
-        ISF, = struct.unpack_from(UINT16, raw[:EVENT_LEN], 18)
-        bgsourcetype, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 24)
-        cgmcalibration, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 11)
+        (selectediob,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 25)
+        (BG,) = struct.unpack_from(UINT16, raw[:EVENT_LEN], 12)
+        (bgentrytype,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 10)
+        (IOB,) = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 14)
+        (targetbg,) = struct.unpack_from(UINT16, raw[:EVENT_LEN], 20)
+        (ISF,) = struct.unpack_from(UINT16, raw[:EVENT_LEN], 18)
+        (bgsourcetype,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 24)
+        (cgmcalibration,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 11)
 
         return LidBgReadingTaken(
-            raw = RawEvent.build(raw),
-            selectediobRaw = selectediob,
-            BG = BG,
-            bgentrytypeRaw = bgentrytype,
-            IOB = IOB,
-            targetbg = targetbg,
-            ISF = ISF,
-            bgsourcetypeRaw = bgsourcetype,
-            cgmcalibrationRaw = cgmcalibration,
+            raw=RawEvent.build(raw),
+            selectediobRaw=selectediob,
+            BG=BG,
+            bgentrytypeRaw=bgentrytype,
+            IOB=IOB,
+            targetbg=targetbg,
+            ISF=ISF,
+            bgsourcetypeRaw=bgsourcetype,
+            cgmcalibrationRaw=cgmcalibration,
         )
 
     @property
@@ -762,15 +765,16 @@ class LidBgReadingTaken(BaseEvent):
 @dataclass
 class LidBolusCompleted(BaseEvent):
     """20: LID_BOLUS_COMPLETED"""
+
     ID = 20
     NAME = "LID_BOLUS_COMPLETED"
 
     raw: RawEvent
     completionstatusRaw: int
     bolusid: int
-    insulindelivered: float # units
-    insulinrequested: float # units
-    IOB: float # units
+    insulindelivered: float  # units
+    insulinrequested: float  # units
+    IOB: float  # units
 
     CompletionstatusMap = {
         "0": "User Aborted",
@@ -781,7 +785,7 @@ class LidBolusCompleted(BaseEvent):
         "5": "Bolus rejected",
         "6": "Aborted by PLGS",
         "7": "Reserved",
-        "8": "Reserved - For future use"
+        "8": "Reserved - For future use",
     }
 
     class CompletionstatusEnum(Enum):
@@ -797,25 +801,25 @@ class LidBolusCompleted(BaseEvent):
         try:
             return self.CompletionstatusEnum(self.completionstatusRaw)
         except ValueError as e:
-            logger.error("Invalid completionstatusRaw in Completionstatus for "+str(self))
+            logger.error("Invalid completionstatusRaw in Completionstatus for " + str(self))
             logger.error(e)
             return None
 
     @staticmethod
     def build(raw):
-        completionstatus, = struct.unpack_from(UINT16, raw[:EVENT_LEN], 12)
-        bolusid, = struct.unpack_from(UINT16, raw[:EVENT_LEN], 10)
-        insulindelivered, = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 18)
-        insulinrequested, = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 22)
-        IOB, = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 14)
+        (completionstatus,) = struct.unpack_from(UINT16, raw[:EVENT_LEN], 12)
+        (bolusid,) = struct.unpack_from(UINT16, raw[:EVENT_LEN], 10)
+        (insulindelivered,) = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 18)
+        (insulinrequested,) = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 22)
+        (IOB,) = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 14)
 
         return LidBolusCompleted(
-            raw = RawEvent.build(raw),
-            completionstatusRaw = completionstatus,
-            bolusid = bolusid,
-            insulindelivered = insulindelivered,
-            insulinrequested = insulinrequested,
-            IOB = IOB,
+            raw=RawEvent.build(raw),
+            completionstatusRaw=completionstatus,
+            bolusid=bolusid,
+            insulindelivered=insulindelivered,
+            insulinrequested=insulinrequested,
+            IOB=IOB,
         )
 
     @property
@@ -830,15 +834,16 @@ class LidBolusCompleted(BaseEvent):
 @dataclass
 class LidBolexCompleted(BaseEvent):
     """21: LID_BOLEX_COMPLETED"""
+
     ID = 21
     NAME = "LID_BOLEX_COMPLETED"
 
     raw: RawEvent
     completionstatusRaw: int
     bolusid: int
-    insulindelivered: float # units
-    insulinrequested: float # units
-    IOB: float # units
+    insulindelivered: float  # units
+    insulinrequested: float  # units
+    IOB: float  # units
 
     CompletionstatusMap = {
         "0": "User Aborted",
@@ -849,7 +854,7 @@ class LidBolexCompleted(BaseEvent):
         "5": "Bolus rejected",
         "6": "Aborted by PLGS",
         "7": "Reserved",
-        "8": "Reserved - For future use"
+        "8": "Reserved - For future use",
     }
 
     class CompletionstatusEnum(Enum):
@@ -865,25 +870,25 @@ class LidBolexCompleted(BaseEvent):
         try:
             return self.CompletionstatusEnum(self.completionstatusRaw)
         except ValueError as e:
-            logger.error("Invalid completionstatusRaw in Completionstatus for "+str(self))
+            logger.error("Invalid completionstatusRaw in Completionstatus for " + str(self))
             logger.error(e)
             return None
 
     @staticmethod
     def build(raw):
-        completionstatus, = struct.unpack_from(UINT16, raw[:EVENT_LEN], 12)
-        bolusid, = struct.unpack_from(UINT16, raw[:EVENT_LEN], 10)
-        insulindelivered, = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 18)
-        insulinrequested, = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 22)
-        IOB, = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 14)
+        (completionstatus,) = struct.unpack_from(UINT16, raw[:EVENT_LEN], 12)
+        (bolusid,) = struct.unpack_from(UINT16, raw[:EVENT_LEN], 10)
+        (insulindelivered,) = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 18)
+        (insulinrequested,) = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 22)
+        (IOB,) = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 14)
 
         return LidBolexCompleted(
-            raw = RawEvent.build(raw),
-            completionstatusRaw = completionstatus,
-            bolusid = bolusid,
-            insulindelivered = insulindelivered,
-            insulinrequested = insulinrequested,
-            IOB = IOB,
+            raw=RawEvent.build(raw),
+            completionstatusRaw=completionstatus,
+            bolusid=bolusid,
+            insulindelivered=insulindelivered,
+            insulinrequested=insulinrequested,
+            IOB=IOB,
         )
 
     @property
@@ -898,6 +903,7 @@ class LidBolexCompleted(BaseEvent):
 @dataclass
 class LidAlertCleared(BaseEvent):
     """26: LID_ALERT_CLEARED"""
+
     ID = 26
     NAME = "LID_ALERT_CLEARED"
 
@@ -968,7 +974,7 @@ class LidAlertCleared(BaseEvent):
         "60": "DEFAULT_ALERT_60",
         "61": "DEFAULT_ALERT_61",
         "62": "DEFAULT_ALERT_62",
-        "63": "DEFAULT_ALERT_63"
+        "63": "DEFAULT_ALERT_63",
     }
 
     class AlertidEnum(Enum):
@@ -1041,19 +1047,19 @@ class LidAlertCleared(BaseEvent):
         try:
             return self.AlertidEnum(self.alertidRaw)
         except ValueError as e:
-            logger.error("Invalid alertidRaw in Alertid for "+str(self))
+            logger.error("Invalid alertidRaw in Alertid for " + str(self))
             logger.error(e)
             return None
 
     @staticmethod
     def build(raw):
-        alertid, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
-        faultlocatordata, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 14)
+        (alertid,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
+        (faultlocatordata,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 14)
 
         return LidAlertCleared(
-            raw = RawEvent.build(raw),
-            alertidRaw = alertid,
-            faultlocatordata = faultlocatordata,
+            raw=RawEvent.build(raw),
+            alertidRaw=alertid,
+            faultlocatordata=faultlocatordata,
         )
 
     @property
@@ -1068,6 +1074,7 @@ class LidAlertCleared(BaseEvent):
 @dataclass
 class LidAlarmCleared(BaseEvent):
     """28: LID_ALARM_CLEARED"""
+
     ID = 28
     NAME = "LID_ALARM_CLEARED"
 
@@ -1138,7 +1145,7 @@ class LidAlarmCleared(BaseEvent):
         "60": "DEFAULT_ALARM_60",
         "61": "DEFAULT_ALARM_61",
         "62": "DEFAULT_ALARM_62",
-        "63": "DEFAULT_ALARM_63"
+        "63": "DEFAULT_ALARM_63",
     }
 
     class AlarmidEnum(Enum):
@@ -1212,17 +1219,17 @@ class LidAlarmCleared(BaseEvent):
         try:
             return self.AlarmidEnum(self.alarmidRaw)
         except ValueError as e:
-            logger.error("Invalid alarmidRaw in Alarmid for "+str(self))
+            logger.error("Invalid alarmidRaw in Alarmid for " + str(self))
             logger.error(e)
             return None
 
     @staticmethod
     def build(raw):
-        alarmid, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
+        (alarmid,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
 
         return LidAlarmCleared(
-            raw = RawEvent.build(raw),
-            alarmidRaw = alarmid,
+            raw=RawEvent.build(raw),
+            alarmidRaw=alarmid,
         )
 
     @property
@@ -1237,23 +1244,23 @@ class LidAlarmCleared(BaseEvent):
 @dataclass
 class LidCartridgeFilled(BaseEvent):
     """33: LID_CARTRIDGE_FILLED"""
+
     ID = 33
     NAME = "LID_CARTRIDGE_FILLED"
 
     raw: RawEvent
-    insulinvolume: int # units
-    v2Volume: float # units
-
+    insulinvolume: int  # units
+    v2Volume: float  # units
 
     @staticmethod
     def build(raw):
-        insulinvolume, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
-        v2Volume, = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 14)
+        (insulinvolume,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
+        (v2Volume,) = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 14)
 
         return LidCartridgeFilled(
-            raw = RawEvent.build(raw),
-            insulinvolume = insulinvolume,
-            v2Volume = v2Volume,
+            raw=RawEvent.build(raw),
+            insulinvolume=insulinvolume,
+            v2Volume=v2Volume,
         )
 
     @property
@@ -1268,35 +1275,35 @@ class LidCartridgeFilled(BaseEvent):
 @dataclass
 class LidShelfMode(BaseEvent):
     """53: LID_SHELF_MODE"""
+
     ID = 53
     NAME = "LID_SHELF_MODE"
 
     raw: RawEvent
-    msecsincereset: int # ms
-    lipocurrent: int # mA
-    lipoAbc: int # %
-    lipoIbc: int # %
-    lipoRemcap: int # mAh
-    lipoMv: int # mV
-
+    msecsincereset: int  # ms
+    lipocurrent: int  # mA
+    lipoAbc: int  # %
+    lipoIbc: int  # %
+    lipoRemcap: int  # mAh
+    lipoMv: int  # mV
 
     @staticmethod
     def build(raw):
-        msecsincereset, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
-        lipocurrent, = struct.unpack_from(INT16, raw[:EVENT_LEN], 16)
-        lipoAbc, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 15)
-        lipoIbc, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 14)
-        lipoRemcap, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 18)
-        lipoMv, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 22)
+        (msecsincereset,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
+        (lipocurrent,) = struct.unpack_from(INT16, raw[:EVENT_LEN], 16)
+        (lipoAbc,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 15)
+        (lipoIbc,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 14)
+        (lipoRemcap,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 18)
+        (lipoMv,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 22)
 
         return LidShelfMode(
-            raw = RawEvent.build(raw),
-            msecsincereset = msecsincereset,
-            lipocurrent = lipocurrent,
-            lipoAbc = lipoAbc,
-            lipoIbc = lipoIbc,
-            lipoRemcap = lipoRemcap,
-            lipoMv = lipoMv,
+            raw=RawEvent.build(raw),
+            msecsincereset=msecsincereset,
+            lipocurrent=lipocurrent,
+            lipoAbc=lipoAbc,
+            lipoIbc=lipoIbc,
+            lipoRemcap=lipoRemcap,
+            lipoMv=lipoMv,
         )
 
     @property
@@ -1311,19 +1318,17 @@ class LidShelfMode(BaseEvent):
 @dataclass
 class LidBolusActivated(BaseEvent):
     """55: LID_BOLUS_ACTIVATED"""
+
     ID = 55
     NAME = "LID_BOLUS_ACTIVATED"
 
     raw: RawEvent
     selectediobRaw: int
     bolusid: int
-    IOB: float # units
-    bolussize: float # units
+    IOB: float  # units
+    bolussize: float  # units
 
-    SelectediobMap = {
-        "0": "Mudaliar IOB",
-        "1": "Swan IOB Meal"
-    }
+    SelectediobMap = {"0": "Mudaliar IOB", "1": "Swan IOB Meal"}
 
     class SelectediobEnum(Enum):
         MudaliarIob = 0
@@ -1334,23 +1339,23 @@ class LidBolusActivated(BaseEvent):
         try:
             return self.SelectediobEnum(self.selectediobRaw)
         except ValueError as e:
-            logger.error("Invalid selectediobRaw in Selectediob for "+str(self))
+            logger.error("Invalid selectediobRaw in Selectediob for " + str(self))
             logger.error(e)
             return None
 
     @staticmethod
     def build(raw):
-        selectediob, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 11)
-        bolusid, = struct.unpack_from(UINT16, raw[:EVENT_LEN], 12)
-        IOB, = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 14)
-        bolussize, = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 18)
+        (selectediob,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 11)
+        (bolusid,) = struct.unpack_from(UINT16, raw[:EVENT_LEN], 12)
+        (IOB,) = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 14)
+        (bolussize,) = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 18)
 
         return LidBolusActivated(
-            raw = RawEvent.build(raw),
-            selectediobRaw = selectediob,
-            bolusid = bolusid,
-            IOB = IOB,
-            bolussize = bolussize,
+            raw=RawEvent.build(raw),
+            selectediobRaw=selectediob,
+            bolusid=bolusid,
+            IOB=IOB,
+            bolussize=bolussize,
         )
 
     @property
@@ -1365,19 +1370,17 @@ class LidBolusActivated(BaseEvent):
 @dataclass
 class LidBolexActivated(BaseEvent):
     """59: LID_BOLEX_ACTIVATED"""
+
     ID = 59
     NAME = "LID_BOLEX_ACTIVATED"
 
     raw: RawEvent
     selectediobRaw: int
     bolusid: int
-    IOB: float # units
-    bolexsize: float # units
+    IOB: float  # units
+    bolexsize: float  # units
 
-    SelectediobMap = {
-        "0": "Mudaliar IOB",
-        "1": "Swan IOB Meal"
-    }
+    SelectediobMap = {"0": "Mudaliar IOB", "1": "Swan IOB Meal"}
 
     class SelectediobEnum(Enum):
         MudaliarIob = 0
@@ -1388,23 +1391,23 @@ class LidBolexActivated(BaseEvent):
         try:
             return self.SelectediobEnum(self.selectediobRaw)
         except ValueError as e:
-            logger.error("Invalid selectediobRaw in Selectediob for "+str(self))
+            logger.error("Invalid selectediobRaw in Selectediob for " + str(self))
             logger.error(e)
             return None
 
     @staticmethod
     def build(raw):
-        selectediob, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 11)
-        bolusid, = struct.unpack_from(UINT16, raw[:EVENT_LEN], 12)
-        IOB, = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 14)
-        bolexsize, = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 18)
+        (selectediob,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 11)
+        (bolusid,) = struct.unpack_from(UINT16, raw[:EVENT_LEN], 12)
+        (IOB,) = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 14)
+        (bolexsize,) = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 18)
 
         return LidBolexActivated(
-            raw = RawEvent.build(raw),
-            selectediobRaw = selectediob,
-            bolusid = bolusid,
-            IOB = IOB,
-            bolexsize = bolexsize,
+            raw=RawEvent.build(raw),
+            selectediobRaw=selectediob,
+            bolusid=bolusid,
+            IOB=IOB,
+            bolexsize=bolexsize,
         )
 
     @property
@@ -1419,6 +1422,7 @@ class LidBolexActivated(BaseEvent):
 @dataclass
 class LidDataLogCorruption(BaseEvent):
     """60: LID_DATA_LOG_CORRUPTION"""
+
     ID = 60
     NAME = "LID_DATA_LOG_CORRUPTION"
 
@@ -1426,16 +1430,15 @@ class LidDataLogCorruption(BaseEvent):
     block: int
     reason: int
 
-
     @staticmethod
     def build(raw):
-        block, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
-        reason, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 17)
+        (block,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
+        (reason,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 17)
 
         return LidDataLogCorruption(
-            raw = RawEvent.build(raw),
-            block = block,
-            reason = reason,
+            raw=RawEvent.build(raw),
+            block=block,
+            reason=reason,
         )
 
     @property
@@ -1450,18 +1453,19 @@ class LidDataLogCorruption(BaseEvent):
 @dataclass
 class LidCannulaFilled(BaseEvent):
     """61: LID_CANNULA_FILLED"""
+
     ID = 61
     NAME = "LID_CANNULA_FILLED"
 
     raw: RawEvent
-    primesize: float # units
+    primesize: float  # units
     completionstatusRaw: int
 
     CompletionstatusMap = {
         "0": "User Aborted",
         "1": "Terminated by Alarm",
         "2": "Terminated by Malfunction",
-        "3": "Completed"
+        "3": "Completed",
     }
 
     class CompletionstatusEnum(Enum):
@@ -1475,19 +1479,19 @@ class LidCannulaFilled(BaseEvent):
         try:
             return self.CompletionstatusEnum(self.completionstatusRaw)
         except ValueError as e:
-            logger.error("Invalid completionstatusRaw in Completionstatus for "+str(self))
+            logger.error("Invalid completionstatusRaw in Completionstatus for " + str(self))
             logger.error(e)
             return None
 
     @staticmethod
     def build(raw):
-        primesize, = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 10)
-        completionstatus, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 14)
+        (primesize,) = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 10)
+        (completionstatus,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 14)
 
         return LidCannulaFilled(
-            raw = RawEvent.build(raw),
-            primesize = primesize,
-            completionstatusRaw = completionstatus,
+            raw=RawEvent.build(raw),
+            primesize=primesize,
+            completionstatusRaw=completionstatus,
         )
 
     @property
@@ -1502,19 +1506,20 @@ class LidCannulaFilled(BaseEvent):
 @dataclass
 class LidTubingFilled(BaseEvent):
     """63: LID_TUBING_FILLED"""
+
     ID = 63
     NAME = "LID_TUBING_FILLED"
 
     raw: RawEvent
-    primesize: float # units
+    primesize: float  # units
     completionstatusRaw: int
-    position: int # counts
+    position: int  # counts
 
     CompletionstatusMap = {
         "0": "User Aborted",
         "1": "Terminated by Alarm",
         "2": "Terminated by Malfunction",
-        "3": "Completed"
+        "3": "Completed",
     }
 
     class CompletionstatusEnum(Enum):
@@ -1528,21 +1533,21 @@ class LidTubingFilled(BaseEvent):
         try:
             return self.CompletionstatusEnum(self.completionstatusRaw)
         except ValueError as e:
-            logger.error("Invalid completionstatusRaw in Completionstatus for "+str(self))
+            logger.error("Invalid completionstatusRaw in Completionstatus for " + str(self))
             logger.error(e)
             return None
 
     @staticmethod
     def build(raw):
-        primesize, = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 10)
-        completionstatus, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 14)
-        position, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 18)
+        (primesize,) = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 10)
+        (completionstatus,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 14)
+        (position,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 18)
 
         return LidTubingFilled(
-            raw = RawEvent.build(raw),
-            primesize = primesize,
-            completionstatusRaw = completionstatus,
-            position = position,
+            raw=RawEvent.build(raw),
+            primesize=primesize,
+            completionstatusRaw=completionstatus,
+            position=position,
         )
 
     @property
@@ -1557,6 +1562,7 @@ class LidTubingFilled(BaseEvent):
 @dataclass
 class LidBolusRequestedMsg1(BaseEvent):
     """64: LID_BOLUS_REQUESTED_MSG1"""
+
     ID = 64
     NAME = "LID_BOLUS_REQUESTED_MSG1"
 
@@ -1564,17 +1570,12 @@ class LidBolusRequestedMsg1(BaseEvent):
     bolusid: int
     bolustypeRaw: int
     correctionbolusincludedRaw: int
-    carbamount: int # grams
-    BG: int # mg/dL
-    carbratioRaw: int # g/u
-    IOB: float # units
+    carbamount: int  # grams
+    BG: int  # mg/dL
+    carbratioRaw: int  # g/u
+    IOB: float  # units
 
-    BolustypeMap = {
-        "0": "Insulin",
-        "1": "Carb",
-        "2": "Automatic Correction",
-        "3": "Remote"
-    }
+    BolustypeMap = {"0": "Insulin", "1": "Carb", "2": "Automatic Correction", "3": "Remote"}
 
     class BolustypeEnum(Enum):
         Insulin = 0
@@ -1587,14 +1588,11 @@ class LidBolusRequestedMsg1(BaseEvent):
         try:
             return self.BolustypeEnum(self.bolustypeRaw)
         except ValueError as e:
-            logger.error("Invalid bolustypeRaw in Bolustype for "+str(self))
+            logger.error("Invalid bolustypeRaw in Bolustype for " + str(self))
             logger.error(e)
             return None
 
-    CorrectionbolusincludedMap = {
-        "0": "No",
-        "1": "Yes"
-    }
+    CorrectionbolusincludedMap = {"0": "No", "1": "Yes"}
 
     class CorrectionbolusincludedEnum(Enum):
         No = 0
@@ -1605,7 +1603,9 @@ class LidBolusRequestedMsg1(BaseEvent):
         try:
             return self.CorrectionbolusincludedEnum(self.correctionbolusincludedRaw)
         except ValueError as e:
-            logger.error("Invalid correctionbolusincludedRaw in Correctionbolusincluded for "+str(self))
+            logger.error(
+                "Invalid correctionbolusincludedRaw in Correctionbolusincluded for " + str(self)
+            )
             logger.error(e)
             return None
 
@@ -1615,23 +1615,23 @@ class LidBolusRequestedMsg1(BaseEvent):
 
     @staticmethod
     def build(raw):
-        bolusid, = struct.unpack_from(UINT16, raw[:EVENT_LEN], 12)
-        bolustype, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 11)
-        correctionbolusincluded, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 10)
-        carbamount, = struct.unpack_from(UINT16, raw[:EVENT_LEN], 16)
-        BG, = struct.unpack_from(UINT16, raw[:EVENT_LEN], 14)
-        carbratio, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 22)
-        IOB, = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 18)
+        (bolusid,) = struct.unpack_from(UINT16, raw[:EVENT_LEN], 12)
+        (bolustype,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 11)
+        (correctionbolusincluded,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 10)
+        (carbamount,) = struct.unpack_from(UINT16, raw[:EVENT_LEN], 16)
+        (BG,) = struct.unpack_from(UINT16, raw[:EVENT_LEN], 14)
+        (carbratio,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 22)
+        (IOB,) = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 18)
 
         return LidBolusRequestedMsg1(
-            raw = RawEvent.build(raw),
-            bolusid = bolusid,
-            bolustypeRaw = bolustype,
-            correctionbolusincludedRaw = correctionbolusincluded,
-            carbamount = carbamount,
-            BG = BG,
-            carbratioRaw = carbratio,
-            IOB = IOB,
+            raw=RawEvent.build(raw),
+            bolusid=bolusid,
+            bolustypeRaw=bolustype,
+            correctionbolusincludedRaw=correctionbolusincluded,
+            carbamount=carbamount,
+            BG=BG,
+            carbratioRaw=carbratio,
+            IOB=IOB,
         )
 
     @property
@@ -1646,6 +1646,7 @@ class LidBolusRequestedMsg1(BaseEvent):
 @dataclass
 class LidBolusRequestedMsg2(BaseEvent):
     """65: LID_BOLUS_REQUESTED_MSG2"""
+
     ID = 65
     NAME = "LID_BOLUS_REQUESTED_MSG2"
 
@@ -1653,17 +1654,14 @@ class LidBolusRequestedMsg2(BaseEvent):
     selectediobRaw: int
     bolusid: int
     optionsRaw: int
-    standardpercent: int # %
-    duration: int # minutes
-    ISF: int # (mg/dL)/unit
-    targetbg: int # mg/dL
+    standardpercent: int  # %
+    duration: int  # minutes
+    ISF: int  # (mg/dL)/unit
+    targetbg: int  # mg/dL
     useroverrideRaw: int
     declinedcorrectionRaw: int
 
-    SelectediobMap = {
-        "0": "Mudaliar IOB",
-        "1": "Swan IOB Meal"
-    }
+    SelectediobMap = {"0": "Mudaliar IOB", "1": "Swan IOB Meal"}
 
     class SelectediobEnum(Enum):
         MudaliarIob = 0
@@ -1674,7 +1672,7 @@ class LidBolusRequestedMsg2(BaseEvent):
         try:
             return self.SelectediobEnum(self.selectediobRaw)
         except ValueError as e:
-            logger.error("Invalid selectediobRaw in Selectediob for "+str(self))
+            logger.error("Invalid selectediobRaw in Selectediob for " + str(self))
             logger.error(e)
             return None
 
@@ -1686,7 +1684,7 @@ class LidBolusRequestedMsg2(BaseEvent):
         "4": "BLE Standard Bolus",
         "5": "BLE Extended Bolus",
         "6": "Eating Soon Automatic Bolus",
-        "7": "Late Bolus"
+        "7": "Late Bolus",
     }
 
     class OptionsEnum(Enum):
@@ -1704,13 +1702,13 @@ class LidBolusRequestedMsg2(BaseEvent):
         try:
             return self.OptionsEnum(self.optionsRaw)
         except ValueError as e:
-            logger.error("Invalid optionsRaw in Options for "+str(self))
+            logger.error("Invalid optionsRaw in Options for " + str(self))
             logger.error(e)
             return None
 
     UseroverrideMap = {
-        "0": "\"No\", user did not override the bolus size",
-        "1": "\"Yes\", user did override the bolus size"
+        "0": '"No", user did not override the bolus size',
+        "1": '"Yes", user did override the bolus size',
     }
 
     class UseroverrideEnum(Enum):
@@ -1722,13 +1720,13 @@ class LidBolusRequestedMsg2(BaseEvent):
         try:
             return self.UseroverrideEnum(self.useroverrideRaw)
         except ValueError as e:
-            logger.error("Invalid useroverrideRaw in Useroverride for "+str(self))
+            logger.error("Invalid useroverrideRaw in Useroverride for " + str(self))
             logger.error(e)
             return None
 
     DeclinedcorrectionMap = {
-        "0": "\"No\", user did not decline the recommended correction",
-        "1": "\"Yes\", user declined the recommended correction"
+        "0": '"No", user did not decline the recommended correction',
+        "1": '"Yes", user declined the recommended correction',
     }
 
     class DeclinedcorrectionEnum(Enum):
@@ -1740,33 +1738,33 @@ class LidBolusRequestedMsg2(BaseEvent):
         try:
             return self.DeclinedcorrectionEnum(self.declinedcorrectionRaw)
         except ValueError as e:
-            logger.error("Invalid declinedcorrectionRaw in Declinedcorrection for "+str(self))
+            logger.error("Invalid declinedcorrectionRaw in Declinedcorrection for " + str(self))
             logger.error(e)
             return None
 
     @staticmethod
     def build(raw):
-        selectediob, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 23)
-        bolusid, = struct.unpack_from(UINT16, raw[:EVENT_LEN], 12)
-        options, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 11)
-        standardpercent, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 10)
-        duration, = struct.unpack_from(UINT16, raw[:EVENT_LEN], 16)
-        ISF, = struct.unpack_from(UINT16, raw[:EVENT_LEN], 20)
-        targetbg, = struct.unpack_from(UINT16, raw[:EVENT_LEN], 18)
-        useroverride, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 25)
-        declinedcorrection, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 24)
+        (selectediob,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 23)
+        (bolusid,) = struct.unpack_from(UINT16, raw[:EVENT_LEN], 12)
+        (options,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 11)
+        (standardpercent,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 10)
+        (duration,) = struct.unpack_from(UINT16, raw[:EVENT_LEN], 16)
+        (ISF,) = struct.unpack_from(UINT16, raw[:EVENT_LEN], 20)
+        (targetbg,) = struct.unpack_from(UINT16, raw[:EVENT_LEN], 18)
+        (useroverride,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 25)
+        (declinedcorrection,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 24)
 
         return LidBolusRequestedMsg2(
-            raw = RawEvent.build(raw),
-            selectediobRaw = selectediob,
-            bolusid = bolusid,
-            optionsRaw = options,
-            standardpercent = standardpercent,
-            duration = duration,
-            ISF = ISF,
-            targetbg = targetbg,
-            useroverrideRaw = useroverride,
-            declinedcorrectionRaw = declinedcorrection,
+            raw=RawEvent.build(raw),
+            selectediobRaw=selectediob,
+            bolusid=bolusid,
+            optionsRaw=options,
+            standardpercent=standardpercent,
+            duration=duration,
+            ISF=ISF,
+            targetbg=targetbg,
+            useroverrideRaw=useroverride,
+            declinedcorrectionRaw=declinedcorrection,
         )
 
     @property
@@ -1781,29 +1779,29 @@ class LidBolusRequestedMsg2(BaseEvent):
 @dataclass
 class LidBolusRequestedMsg3(BaseEvent):
     """66: LID_BOLUS_REQUESTED_MSG3"""
+
     ID = 66
     NAME = "LID_BOLUS_REQUESTED_MSG3"
 
     raw: RawEvent
     bolusid: int
-    foodbolussize: float # units
-    correctionbolussize: float # units
-    totalbolussize: float # units
-
+    foodbolussize: float  # units
+    correctionbolussize: float  # units
+    totalbolussize: float  # units
 
     @staticmethod
     def build(raw):
-        bolusid, = struct.unpack_from(UINT16, raw[:EVENT_LEN], 12)
-        foodbolussize, = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 14)
-        correctionbolussize, = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 18)
-        totalbolussize, = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 22)
+        (bolusid,) = struct.unpack_from(UINT16, raw[:EVENT_LEN], 12)
+        (foodbolussize,) = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 14)
+        (correctionbolussize,) = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 18)
+        (totalbolussize,) = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 22)
 
         return LidBolusRequestedMsg3(
-            raw = RawEvent.build(raw),
-            bolusid = bolusid,
-            foodbolussize = foodbolussize,
-            correctionbolussize = correctionbolussize,
-            totalbolussize = totalbolussize,
+            raw=RawEvent.build(raw),
+            bolusid=bolusid,
+            foodbolussize=foodbolussize,
+            correctionbolussize=correctionbolussize,
+            totalbolussize=totalbolussize,
         )
 
     @property
@@ -1818,26 +1816,26 @@ class LidBolusRequestedMsg3(BaseEvent):
 @dataclass
 class LidNewDay(BaseEvent):
     """90: LID_NEW_DAY"""
+
     ID = 90
     NAME = "LID_NEW_DAY"
 
     raw: RawEvent
-    commandedbasalrate: float # units/hour
+    commandedbasalrate: float  # units/hour
     featuresbitmask: int
     featurebitmaskindex: int
 
-
     @staticmethod
     def build(raw):
-        commandedbasalrate, = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 10)
-        featuresbitmask, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 14)
-        featurebitmaskindex, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 18)
+        (commandedbasalrate,) = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 10)
+        (featuresbitmask,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 14)
+        (featurebitmaskindex,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 18)
 
         return LidNewDay(
-            raw = RawEvent.build(raw),
-            commandedbasalrate = commandedbasalrate,
-            featuresbitmask = featuresbitmask,
-            featurebitmaskindex = featurebitmaskindex,
+            raw=RawEvent.build(raw),
+            commandedbasalrate=commandedbasalrate,
+            featuresbitmask=featuresbitmask,
+            featurebitmaskindex=featurebitmaskindex,
         )
 
     @property
@@ -1852,6 +1850,7 @@ class LidNewDay(BaseEvent):
 @dataclass
 class LidArmInit(BaseEvent):
     """99: LID_ARM_INIT"""
+
     ID = 99
     NAME = "LID_ARM_INIT"
 
@@ -1861,20 +1860,19 @@ class LidArmInit(BaseEvent):
     configbbits: int
     numlogentries: int
 
-
     @staticmethod
     def build(raw):
-        version, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
-        configabits, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 14)
-        configbbits, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 18)
-        numlogentries, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 22)
+        (version,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
+        (configabits,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 14)
+        (configbbits,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 18)
+        (numlogentries,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 22)
 
         return LidArmInit(
-            raw = RawEvent.build(raw),
-            version = version,
-            configabits = configabits,
-            configbbits = configbbits,
-            numlogentries = numlogentries,
+            raw=RawEvent.build(raw),
+            version=version,
+            configabits=configabits,
+            configbbits=configbbits,
+            numlogentries=numlogentries,
         )
 
     @property
@@ -1889,13 +1887,14 @@ class LidArmInit(BaseEvent):
 @dataclass
 class LidPlgsPeriodic(BaseEvent):
     """140: LID_PLGS_PERIODIC"""
+
     ID = 140
     NAME = "LID_PLGS_PERIODIC"
 
     raw: RawEvent
-    timestamp: int # sec
-    FMR: int # mg/dL
-    PGV: int # mg/dL
+    timestamp: int  # sec
+    FMR: int  # mg/dL
+    PGV: int  # mg/dL
     fmrstatusRaw: int
     pgvvalidRaw: int
     rulestateRaw: int
@@ -1909,7 +1908,7 @@ class LidPlgsPeriodic(BaseEvent):
         "3": "Sensor session stopped (no FMR)",
         "4": "Sensor session started (no FMR)",
         "5": "Calibration entered (no FMR)",
-        "6": "Pumping event (no FMR)"
+        "6": "Pumping event (no FMR)",
     }
 
     class FmrstatusEnum(Enum):
@@ -1926,14 +1925,11 @@ class LidPlgsPeriodic(BaseEvent):
         try:
             return self.FmrstatusEnum(self.fmrstatusRaw)
         except ValueError as e:
-            logger.error("Invalid fmrstatusRaw in Fmrstatus for "+str(self))
+            logger.error("Invalid fmrstatusRaw in Fmrstatus for " + str(self))
             logger.error(e)
             return None
 
-    PgvvalidMap = {
-        "0": "FALSE",
-        "1": "TRUE"
-    }
+    PgvvalidMap = {"0": "FALSE", "1": "TRUE"}
 
     class PgvvalidEnum(Enum):
         FalseVal = 0
@@ -1944,15 +1940,11 @@ class LidPlgsPeriodic(BaseEvent):
         try:
             return self.PgvvalidEnum(self.pgvvalidRaw)
         except ValueError as e:
-            logger.error("Invalid pgvvalidRaw in Pgvvalid for "+str(self))
+            logger.error("Invalid pgvvalidRaw in Pgvvalid for " + str(self))
             logger.error(e)
             return None
 
-    RulestateMap = {
-        "0": "HO_SUSPEND_RULE",
-        "1": "HO_RECOVERY_RULE",
-        "2": "HO_UNAVAILABLE_RULE"
-    }
+    RulestateMap = {"0": "HO_SUSPEND_RULE", "1": "HO_RECOVERY_RULE", "2": "HO_UNAVAILABLE_RULE"}
 
     class RulestateBitmask(IntFlag):
         HoSuspendRule = 2**0
@@ -1964,7 +1956,7 @@ class LidPlgsPeriodic(BaseEvent):
         try:
             return self.RulestateBitmask(self.rulestateRaw)
         except ValueError as e:
-            logger.error("Invalid rulestateRaw in RulestateBitmask for "+str(self))
+            logger.error("Invalid rulestateRaw in RulestateBitmask for " + str(self))
             logger.error(e)
             return None
 
@@ -1972,7 +1964,7 @@ class LidPlgsPeriodic(BaseEvent):
         "0": "On and available",
         "1": "On and suspended",
         "2": "Off",
-        "3": "On and not available"
+        "3": "On and not available",
     }
 
     class HominstateEnum(Enum):
@@ -1986,7 +1978,7 @@ class LidPlgsPeriodic(BaseEvent):
         try:
             return self.HominstateEnum(self.hominstateRaw)
         except ValueError as e:
-            logger.error("Invalid hominstateRaw in Hominstate for "+str(self))
+            logger.error("Invalid hominstateRaw in Hominstate for " + str(self))
             logger.error(e)
             return None
 
@@ -2004,7 +1996,7 @@ class LidPlgsPeriodic(BaseEvent):
         "10": "Unavailable - High EGV",
         "11": "Unavailable - Not Therapy",
         "12": "Unavailable - Bolus Active",
-        "13": "Unavailable - No Current"
+        "13": "Unavailable - No Current",
     }
 
     class StatusBitmask(IntFlag):
@@ -2025,31 +2017,31 @@ class LidPlgsPeriodic(BaseEvent):
         try:
             return self.StatusBitmask(self.statusRaw)
         except ValueError as e:
-            logger.error("Invalid statusRaw in StatusBitmask for "+str(self))
+            logger.error("Invalid statusRaw in StatusBitmask for " + str(self))
             logger.error(e)
             return None
 
     @staticmethod
     def build(raw):
-        timestamp, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
-        FMR, = struct.unpack_from(UINT16, raw[:EVENT_LEN], 16)
-        PGV, = struct.unpack_from(UINT16, raw[:EVENT_LEN], 14)
-        fmrstatus, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 21)
-        pgvvalid, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 20)
-        rulestate, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 19)
-        hominstate, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 18)
-        status, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 22)
+        (timestamp,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
+        (FMR,) = struct.unpack_from(UINT16, raw[:EVENT_LEN], 16)
+        (PGV,) = struct.unpack_from(UINT16, raw[:EVENT_LEN], 14)
+        (fmrstatus,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 21)
+        (pgvvalid,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 20)
+        (rulestate,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 19)
+        (hominstate,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 18)
+        (status,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 22)
 
         return LidPlgsPeriodic(
-            raw = RawEvent.build(raw),
-            timestamp = timestamp,
-            FMR = FMR,
-            PGV = PGV,
-            fmrstatusRaw = fmrstatus,
-            pgvvalidRaw = pgvvalid,
-            rulestateRaw = rulestate,
-            hominstateRaw = hominstate,
-            statusRaw = status,
+            raw=RawEvent.build(raw),
+            timestamp=timestamp,
+            FMR=FMR,
+            PGV=PGV,
+            fmrstatusRaw=fmrstatus,
+            pgvvalidRaw=pgvvalid,
+            rulestateRaw=rulestate,
+            hominstateRaw=hominstate,
+            statusRaw=status,
         )
 
     @property
@@ -2064,6 +2056,7 @@ class LidPlgsPeriodic(BaseEvent):
 @dataclass
 class LidCgmAlertActivated(BaseEvent):
     """171: LID_CGM_ALERT_ACTIVATED"""
+
     ID = 171
     NAME = "LID_CGM_ALERT_ACTIVATED"
 
@@ -2081,7 +2074,7 @@ class LidCgmAlertActivated(BaseEvent):
         "26": "CGM Temperature",
         "27": "CGM Failed Connection",
         "39": "CGM Transmitter Expired",
-        "40": "Pump Bluetooth Error"
+        "40": "Pump Bluetooth Error",
     }
 
     class DalertidEnum(Enum):
@@ -2099,23 +2092,23 @@ class LidCgmAlertActivated(BaseEvent):
         try:
             return self.DalertidEnum(self.dalertidRaw)
         except ValueError as e:
-            logger.error("Invalid dalertidRaw in Dalertid for "+str(self))
+            logger.error("Invalid dalertidRaw in Dalertid for " + str(self))
             logger.error(e)
             return None
 
     @staticmethod
     def build(raw):
-        dalertid, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
-        faultlocatordata, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 14)
-        param1, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 18)
-        param2, = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 22)
+        (dalertid,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
+        (faultlocatordata,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 14)
+        (param1,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 18)
+        (param2,) = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 22)
 
         return LidCgmAlertActivated(
-            raw = RawEvent.build(raw),
-            dalertidRaw = dalertid,
-            faultlocatordata = faultlocatordata,
-            param1 = param1,
-            param2 = param2,
+            raw=RawEvent.build(raw),
+            dalertidRaw=dalertid,
+            faultlocatordata=faultlocatordata,
+            param1=param1,
+            param2=param2,
         )
 
     @property
@@ -2130,6 +2123,7 @@ class LidCgmAlertActivated(BaseEvent):
 @dataclass
 class LidCgmAlertCleared(BaseEvent):
     """172: LID_CGM_ALERT_CLEARED"""
+
     ID = 172
     NAME = "LID_CGM_ALERT_CLEARED"
 
@@ -2144,7 +2138,7 @@ class LidCgmAlertCleared(BaseEvent):
         "26": "CGM Temperature",
         "27": "CGM Failed Connection",
         "39": "CGM Transmitter Expired",
-        "40": "Pump Bluetooth Error"
+        "40": "Pump Bluetooth Error",
     }
 
     class DalertidEnum(Enum):
@@ -2162,17 +2156,17 @@ class LidCgmAlertCleared(BaseEvent):
         try:
             return self.DalertidEnum(self.dalertidRaw)
         except ValueError as e:
-            logger.error("Invalid dalertidRaw in Dalertid for "+str(self))
+            logger.error("Invalid dalertidRaw in Dalertid for " + str(self))
             logger.error(e)
             return None
 
     @staticmethod
     def build(raw):
-        dalertid, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
+        (dalertid,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
 
         return LidCgmAlertCleared(
-            raw = RawEvent.build(raw),
-            dalertidRaw = dalertid,
+            raw=RawEvent.build(raw),
+            dalertidRaw=dalertid,
         )
 
     @property
@@ -2187,6 +2181,7 @@ class LidCgmAlertCleared(BaseEvent):
 @dataclass
 class LidVersionInfo(BaseEvent):
     """191: LID_VERSION_INFO"""
+
     ID = 191
     NAME = "LID_VERSION_INFO"
 
@@ -2196,20 +2191,19 @@ class LidVersionInfo(BaseEvent):
     configbbits: int
     armcrc: int
 
-
     @staticmethod
     def build(raw):
-        version, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
-        configabits, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 14)
-        configbbits, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 18)
-        armcrc, = struct.unpack_from(UINT16, raw[:EVENT_LEN], 24)
+        (version,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
+        (configabits,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 14)
+        (configbbits,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 18)
+        (armcrc,) = struct.unpack_from(UINT16, raw[:EVENT_LEN], 24)
 
         return LidVersionInfo(
-            raw = RawEvent.build(raw),
-            version = version,
-            configabits = configabits,
-            configbbits = configbbits,
-            armcrc = armcrc,
+            raw=RawEvent.build(raw),
+            version=version,
+            configabits=configabits,
+            configbbits=configbbits,
+            armcrc=armcrc,
         )
 
     @property
@@ -2224,6 +2218,7 @@ class LidVersionInfo(BaseEvent):
 @dataclass
 class LidUpdateStatus(BaseEvent):
     """203: LID_UPDATE_STATUS"""
+
     ID = 203
     NAME = "LID_UPDATE_STATUS"
 
@@ -2236,10 +2231,7 @@ class LidUpdateStatus(BaseEvent):
     updatesuccessfulRaw: int
     swpartnum: int
 
-    UpdatesuccessfulMap = {
-        "0": "Update Not Successful",
-        "1": "Update Successful"
-    }
+    UpdatesuccessfulMap = {"0": "Update Not Successful", "1": "Update Successful"}
 
     class UpdatesuccessfulEnum(Enum):
         UpdateNotSuccessful = 0
@@ -2250,29 +2242,29 @@ class LidUpdateStatus(BaseEvent):
         try:
             return self.UpdatesuccessfulEnum(self.updatesuccessfulRaw)
         except ValueError as e:
-            logger.error("Invalid updatesuccessfulRaw in Updatesuccessful for "+str(self))
+            logger.error("Invalid updatesuccessfulRaw in Updatesuccessful for " + str(self))
             logger.error(e)
             return None
 
     @staticmethod
     def build(raw):
-        swupdatestatus, = struct.unpack_from(UINT16, raw[:EVENT_LEN], 12)
-        metadataandversionstatus, = struct.unpack_from(UINT16, raw[:EVENT_LEN], 10)
-        fulldlandcrcstatus, = struct.unpack_from(UINT16, raw[:EVENT_LEN], 16)
-        filedlandsideloadstatus, = struct.unpack_from(UINT16, raw[:EVENT_LEN], 14)
-        externalflashstatus, = struct.unpack_from(UINT16, raw[:EVENT_LEN], 20)
-        updatesuccessful, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 19)
-        swpartnum, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 22)
+        (swupdatestatus,) = struct.unpack_from(UINT16, raw[:EVENT_LEN], 12)
+        (metadataandversionstatus,) = struct.unpack_from(UINT16, raw[:EVENT_LEN], 10)
+        (fulldlandcrcstatus,) = struct.unpack_from(UINT16, raw[:EVENT_LEN], 16)
+        (filedlandsideloadstatus,) = struct.unpack_from(UINT16, raw[:EVENT_LEN], 14)
+        (externalflashstatus,) = struct.unpack_from(UINT16, raw[:EVENT_LEN], 20)
+        (updatesuccessful,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 19)
+        (swpartnum,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 22)
 
         return LidUpdateStatus(
-            raw = RawEvent.build(raw),
-            swupdatestatus = swupdatestatus,
-            metadataandversionstatus = metadataandversionstatus,
-            fulldlandcrcstatus = fulldlandcrcstatus,
-            filedlandsideloadstatus = filedlandsideloadstatus,
-            externalflashstatus = externalflashstatus,
-            updatesuccessfulRaw = updatesuccessful,
-            swpartnum = swpartnum,
+            raw=RawEvent.build(raw),
+            swupdatestatus=swupdatestatus,
+            metadataandversionstatus=metadataandversionstatus,
+            fulldlandcrcstatus=fulldlandcrcstatus,
+            filedlandsideloadstatus=filedlandsideloadstatus,
+            externalflashstatus=externalflashstatus,
+            updatesuccessfulRaw=updatesuccessful,
+            swpartnum=swpartnum,
         )
 
     @property
@@ -2287,26 +2279,26 @@ class LidUpdateStatus(BaseEvent):
 @dataclass
 class LidCgmStartSessionGx(BaseEvent):
     """212: LID_CGM_START_SESSION_GX"""
+
     ID = 212
     NAME = "LID_CGM_START_SESSION_GX"
 
     raw: RawEvent
-    currenttransmittertime: int # sec
-    sessionstarttime: int # sec
-    sessionduration: int # days
-
+    currenttransmittertime: int  # sec
+    sessionstarttime: int  # sec
+    sessionduration: int  # days
 
     @staticmethod
     def build(raw):
-        currenttransmittertime, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
-        sessionstarttime, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 14)
-        sessionduration, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 25)
+        (currenttransmittertime,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
+        (sessionstarttime,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 14)
+        (sessionduration,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 25)
 
         return LidCgmStartSessionGx(
-            raw = RawEvent.build(raw),
-            currenttransmittertime = currenttransmittertime,
-            sessionstarttime = sessionstarttime,
-            sessionduration = sessionduration,
+            raw=RawEvent.build(raw),
+            currenttransmittertime=currenttransmittertime,
+            sessionstarttime=sessionstarttime,
+            sessionduration=sessionduration,
         )
 
     @property
@@ -2321,13 +2313,14 @@ class LidCgmStartSessionGx(BaseEvent):
 @dataclass
 class LidCgmJoinSessionGx(BaseEvent):
     """213: LID_CGM_JOIN_SESSION_GX"""
+
     ID = 213
     NAME = "LID_CGM_JOIN_SESSION_GX"
 
     raw: RawEvent
-    currenttransmittertime: int # sec
-    sessionstarttime: int # sec
-    sessionduration: int # days
+    currenttransmittertime: int  # sec
+    sessionstarttime: int  # sec
+    sessionduration: int  # days
     sessionjoinreasonRaw: int
 
     SessionjoinreasonMap = {
@@ -2344,7 +2337,7 @@ class LidCgmJoinSessionGx(BaseEvent):
         "10": "DEXBLES_REASON_TRANSMITTER_IN_SESSION,",
         "11": "DEXBLES_REASON_BLESTACK_INVALID,",
         "12": "DEXBLES_REASON_NEW_AUTOCAL_SESSION_STARTED_SUCCESS,",
-        "13": "DEXBLES_REASON_NO_AUTOCAL_SESSION_IN_PROGRESS"
+        "13": "DEXBLES_REASON_NO_AUTOCAL_SESSION_IN_PROGRESS",
     }
 
     class SessionjoinreasonEnum(Enum):
@@ -2366,23 +2359,23 @@ class LidCgmJoinSessionGx(BaseEvent):
         try:
             return self.SessionjoinreasonEnum(self.sessionjoinreasonRaw)
         except ValueError as e:
-            logger.error("Invalid sessionjoinreasonRaw in Sessionjoinreason for "+str(self))
+            logger.error("Invalid sessionjoinreasonRaw in Sessionjoinreason for " + str(self))
             logger.error(e)
             return None
 
     @staticmethod
     def build(raw):
-        currenttransmittertime, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
-        sessionstarttime, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 14)
-        sessionduration, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 25)
-        sessionjoinreason, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 24)
+        (currenttransmittertime,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
+        (sessionstarttime,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 14)
+        (sessionduration,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 25)
+        (sessionjoinreason,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 24)
 
         return LidCgmJoinSessionGx(
-            raw = RawEvent.build(raw),
-            currenttransmittertime = currenttransmittertime,
-            sessionstarttime = sessionstarttime,
-            sessionduration = sessionduration,
-            sessionjoinreasonRaw = sessionjoinreason,
+            raw=RawEvent.build(raw),
+            currenttransmittertime=currenttransmittertime,
+            sessionstarttime=sessionstarttime,
+            sessionduration=sessionduration,
+            sessionjoinreasonRaw=sessionjoinreason,
         )
 
     @property
@@ -2397,14 +2390,15 @@ class LidCgmJoinSessionGx(BaseEvent):
 @dataclass
 class LidCgmStopSessionGx(BaseEvent):
     """214: LID_CGM_STOP_SESSION_GX"""
+
     ID = 214
     NAME = "LID_CGM_STOP_SESSION_GX"
 
     raw: RawEvent
-    currenttransmittertime: int # sec
-    sessionstarttime: int # sec
-    sessionstoptime: int # sec
-    sessionduration: int # days
+    currenttransmittertime: int  # sec
+    sessionstarttime: int  # sec
+    sessionstoptime: int  # sec
+    sessionduration: int  # days
     sessionstopreasonRaw: int
 
     SessionstopreasonMap = {
@@ -2421,7 +2415,7 @@ class LidCgmStopSessionGx(BaseEvent):
         "10": "DEXBLES_REASON_TRANSMITTER_IN_SESSION,",
         "11": "DEXBLES_REASON_BLESTACK_INVALID,",
         "12": "DEXBLES_REASON_NEW_AUTOCAL_SESSION_STARTED_SUCCESS,",
-        "13": "DEXBLES_REASON_NO_AUTOCAL_SESSION_IN_PROGRESS"
+        "13": "DEXBLES_REASON_NO_AUTOCAL_SESSION_IN_PROGRESS",
     }
 
     class SessionstopreasonEnum(Enum):
@@ -2443,25 +2437,25 @@ class LidCgmStopSessionGx(BaseEvent):
         try:
             return self.SessionstopreasonEnum(self.sessionstopreasonRaw)
         except ValueError as e:
-            logger.error("Invalid sessionstopreasonRaw in Sessionstopreason for "+str(self))
+            logger.error("Invalid sessionstopreasonRaw in Sessionstopreason for " + str(self))
             logger.error(e)
             return None
 
     @staticmethod
     def build(raw):
-        currenttransmittertime, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
-        sessionstarttime, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 14)
-        sessionstoptime, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 18)
-        sessionduration, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 25)
-        sessionstopreason, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 24)
+        (currenttransmittertime,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
+        (sessionstarttime,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 14)
+        (sessionstoptime,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 18)
+        (sessionduration,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 25)
+        (sessionstopreason,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 24)
 
         return LidCgmStopSessionGx(
-            raw = RawEvent.build(raw),
-            currenttransmittertime = currenttransmittertime,
-            sessionstarttime = sessionstarttime,
-            sessionstoptime = sessionstoptime,
-            sessionduration = sessionduration,
-            sessionstopreasonRaw = sessionstopreason,
+            raw=RawEvent.build(raw),
+            currenttransmittertime=currenttransmittertime,
+            sessionstarttime=sessionstarttime,
+            sessionstoptime=sessionstoptime,
+            sessionduration=sessionduration,
+            sessionstopreasonRaw=sessionstopreason,
         )
 
     @property
@@ -2476,12 +2470,13 @@ class LidCgmStopSessionGx(BaseEvent):
 @dataclass
 class LidAaUserModeChange(BaseEvent):
     """229: LID_AA_USER_MODE_CHANGE"""
+
     ID = 229
     NAME = "LID_AA_USER_MODE_CHANGE"
 
     raw: RawEvent
     exercisechoiceRaw: int
-    exercisetime: int # minutes
+    exercisetime: int  # minutes
     currentusermodeRaw: int
     previoususermodeRaw: int
     requestedactionRaw: int
@@ -2490,10 +2485,7 @@ class LidAaUserModeChange(BaseEvent):
     activesleepscheduleRaw: int
     eatingsoonstoppedbytimerRaw: int
 
-    ExercisechoiceMap = {
-        "0": "Continuous",
-        "1": "Timed"
-    }
+    ExercisechoiceMap = {"0": "Continuous", "1": "Timed"}
 
     class ExercisechoiceEnum(Enum):
         Continuous = 0
@@ -2504,16 +2496,11 @@ class LidAaUserModeChange(BaseEvent):
         try:
             return self.ExercisechoiceEnum(self.exercisechoiceRaw)
         except ValueError as e:
-            logger.error("Invalid exercisechoiceRaw in Exercisechoice for "+str(self))
+            logger.error("Invalid exercisechoiceRaw in Exercisechoice for " + str(self))
             logger.error(e)
             return None
 
-    CurrentusermodeMap = {
-        "0": "Normal",
-        "1": "Sleeping",
-        "2": "Exercising",
-        "3": "Eating Soon"
-    }
+    CurrentusermodeMap = {"0": "Normal", "1": "Sleeping", "2": "Exercising", "3": "Eating Soon"}
 
     class CurrentusermodeEnum(Enum):
         Normal = 0
@@ -2526,16 +2513,11 @@ class LidAaUserModeChange(BaseEvent):
         try:
             return self.CurrentusermodeEnum(self.currentusermodeRaw)
         except ValueError as e:
-            logger.error("Invalid currentusermodeRaw in Currentusermode for "+str(self))
+            logger.error("Invalid currentusermodeRaw in Currentusermode for " + str(self))
             logger.error(e)
             return None
 
-    PrevioususermodeMap = {
-        "0": "Normal",
-        "1": "Sleeping",
-        "2": "Exercising",
-        "3": "Eating Soon"
-    }
+    PrevioususermodeMap = {"0": "Normal", "1": "Sleeping", "2": "Exercising", "3": "Eating Soon"}
 
     class PrevioususermodeEnum(Enum):
         Normal = 0
@@ -2548,7 +2530,7 @@ class LidAaUserModeChange(BaseEvent):
         try:
             return self.PrevioususermodeEnum(self.previoususermodeRaw)
         except ValueError as e:
-            logger.error("Invalid previoususermodeRaw in Previoususermode for "+str(self))
+            logger.error("Invalid previoususermodeRaw in Previoususermode for " + str(self))
             logger.error(e)
             return None
 
@@ -2560,7 +2542,7 @@ class LidAaUserModeChange(BaseEvent):
         "4": "Stop Exercise",
         "5": "Stop All",
         "6": "Start Eating Soon",
-        "7": "Stop Eating Soon"
+        "7": "Stop Eating Soon",
     }
 
     class RequestedactionEnum(Enum):
@@ -2578,14 +2560,11 @@ class LidAaUserModeChange(BaseEvent):
         try:
             return self.RequestedactionEnum(self.requestedactionRaw)
         except ValueError as e:
-            logger.error("Invalid requestedactionRaw in Requestedaction for "+str(self))
+            logger.error("Invalid requestedactionRaw in Requestedaction for " + str(self))
             logger.error(e)
             return None
 
-    SleepstartedbyguiMap = {
-        "0": "FALSE",
-        "1": "TRUE"
-    }
+    SleepstartedbyguiMap = {"0": "FALSE", "1": "TRUE"}
 
     class SleepstartedbyguiEnum(Enum):
         FalseVal = 0
@@ -2596,14 +2575,11 @@ class LidAaUserModeChange(BaseEvent):
         try:
             return self.SleepstartedbyguiEnum(self.sleepstartedbyguiRaw)
         except ValueError as e:
-            logger.error("Invalid sleepstartedbyguiRaw in Sleepstartedbygui for "+str(self))
+            logger.error("Invalid sleepstartedbyguiRaw in Sleepstartedbygui for " + str(self))
             logger.error(e)
             return None
 
-    ExercisestoppedbytimerMap = {
-        "0": "False",
-        "1": "True"
-    }
+    ExercisestoppedbytimerMap = {"0": "False", "1": "True"}
 
     class ExercisestoppedbytimerEnum(Enum):
         FalseVal = 0
@@ -2614,7 +2590,9 @@ class LidAaUserModeChange(BaseEvent):
         try:
             return self.ExercisestoppedbytimerEnum(self.exercisestoppedbytimerRaw)
         except ValueError as e:
-            logger.error("Invalid exercisestoppedbytimerRaw in Exercisestoppedbytimer for "+str(self))
+            logger.error(
+                "Invalid exercisestoppedbytimerRaw in Exercisestoppedbytimer for " + str(self)
+            )
             logger.error(e)
             return None
 
@@ -2622,7 +2600,7 @@ class LidAaUserModeChange(BaseEvent):
         "0": "Sleep Schedule 1 is Active",
         "1": "Sleep Schedule 2 is Active",
         "2": "Sleep Schedule 3 is Active",
-        "3": "Sleep Schedule 4 is Active"
+        "3": "Sleep Schedule 4 is Active",
     }
 
     class ActivesleepscheduleBitmask(IntFlag):
@@ -2636,14 +2614,13 @@ class LidAaUserModeChange(BaseEvent):
         try:
             return self.ActivesleepscheduleBitmask(self.activesleepscheduleRaw)
         except ValueError as e:
-            logger.error("Invalid activesleepscheduleRaw in ActivesleepscheduleBitmask for "+str(self))
+            logger.error(
+                "Invalid activesleepscheduleRaw in ActivesleepscheduleBitmask for " + str(self)
+            )
             logger.error(e)
             return None
 
-    EatingsoonstoppedbytimerMap = {
-        "0": "False",
-        "1": "True"
-    }
+    EatingsoonstoppedbytimerMap = {"0": "False", "1": "True"}
 
     class EatingsoonstoppedbytimerEnum(Enum):
         FalseVal = 0
@@ -2654,33 +2631,35 @@ class LidAaUserModeChange(BaseEvent):
         try:
             return self.EatingsoonstoppedbytimerEnum(self.eatingsoonstoppedbytimerRaw)
         except ValueError as e:
-            logger.error("Invalid eatingsoonstoppedbytimerRaw in Eatingsoonstoppedbytimer for "+str(self))
+            logger.error(
+                "Invalid eatingsoonstoppedbytimerRaw in Eatingsoonstoppedbytimer for " + str(self)
+            )
             logger.error(e)
             return None
 
     @staticmethod
     def build(raw):
-        exercisechoice, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 20)
-        exercisetime, = struct.unpack_from(UINT16, raw[:EVENT_LEN], 18)
-        currentusermode, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 13)
-        previoususermode, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 12)
-        requestedaction, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 11)
-        sleepstartedbygui, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 17)
-        exercisestoppedbytimer, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 21)
-        activesleepschedule, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 16)
-        eatingsoonstoppedbytimer, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 25)
+        (exercisechoice,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 20)
+        (exercisetime,) = struct.unpack_from(UINT16, raw[:EVENT_LEN], 18)
+        (currentusermode,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 13)
+        (previoususermode,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 12)
+        (requestedaction,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 11)
+        (sleepstartedbygui,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 17)
+        (exercisestoppedbytimer,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 21)
+        (activesleepschedule,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 16)
+        (eatingsoonstoppedbytimer,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 25)
 
         return LidAaUserModeChange(
-            raw = RawEvent.build(raw),
-            exercisechoiceRaw = exercisechoice,
-            exercisetime = exercisetime,
-            currentusermodeRaw = currentusermode,
-            previoususermodeRaw = previoususermode,
-            requestedactionRaw = requestedaction,
-            sleepstartedbyguiRaw = sleepstartedbygui,
-            exercisestoppedbytimerRaw = exercisestoppedbytimer,
-            activesleepscheduleRaw = activesleepschedule,
-            eatingsoonstoppedbytimerRaw = eatingsoonstoppedbytimer,
+            raw=RawEvent.build(raw),
+            exercisechoiceRaw=exercisechoice,
+            exercisetime=exercisetime,
+            currentusermodeRaw=currentusermode,
+            previoususermodeRaw=previoususermode,
+            requestedactionRaw=requestedaction,
+            sleepstartedbyguiRaw=sleepstartedbygui,
+            exercisestoppedbytimerRaw=exercisestoppedbytimer,
+            activesleepscheduleRaw=activesleepschedule,
+            eatingsoonstoppedbytimerRaw=eatingsoonstoppedbytimer,
         )
 
     @property
@@ -2695,6 +2674,7 @@ class LidAaUserModeChange(BaseEvent):
 @dataclass
 class LidAaPcmChange(BaseEvent):
     """230: LID_AA_PCM_CHANGE"""
+
     ID = 230
     NAME = "LID_AA_PCM_CHANGE"
 
@@ -2707,12 +2687,7 @@ class LidAaPcmChange(BaseEvent):
     closedlooppreferredRaw: int
     sufficientclosedloopparamsRaw: int
 
-    CurrentpcmMap = {
-        "0": "No Control",
-        "1": "Open Loop",
-        "2": "Pining",
-        "3": "Closed Loop"
-    }
+    CurrentpcmMap = {"0": "No Control", "1": "Open Loop", "2": "Pining", "3": "Closed Loop"}
 
     class CurrentpcmEnum(Enum):
         NoControl = 0
@@ -2725,16 +2700,11 @@ class LidAaPcmChange(BaseEvent):
         try:
             return self.CurrentpcmEnum(self.currentpcmRaw)
         except ValueError as e:
-            logger.error("Invalid currentpcmRaw in Currentpcm for "+str(self))
+            logger.error("Invalid currentpcmRaw in Currentpcm for " + str(self))
             logger.error(e)
             return None
 
-    PreviouspcmMap = {
-        "0": "No Control",
-        "1": "Open Loop",
-        "2": "Pining",
-        "3": "Closed Loop"
-    }
+    PreviouspcmMap = {"0": "No Control", "1": "Open Loop", "2": "Pining", "3": "Closed Loop"}
 
     class PreviouspcmEnum(Enum):
         NoControl = 0
@@ -2747,14 +2717,11 @@ class LidAaPcmChange(BaseEvent):
         try:
             return self.PreviouspcmEnum(self.previouspcmRaw)
         except ValueError as e:
-            logger.error("Invalid previouspcmRaw in Previouspcm for "+str(self))
+            logger.error("Invalid previouspcmRaw in Previouspcm for " + str(self))
             logger.error(e)
             return None
 
-    PumpsuspendedMap = {
-        "0": "FALSE",
-        "1": "TRUE"
-    }
+    PumpsuspendedMap = {"0": "FALSE", "1": "TRUE"}
 
     class PumpsuspendedEnum(Enum):
         FalseVal = 0
@@ -2765,14 +2732,11 @@ class LidAaPcmChange(BaseEvent):
         try:
             return self.PumpsuspendedEnum(self.pumpsuspendedRaw)
         except ValueError as e:
-            logger.error("Invalid pumpsuspendedRaw in Pumpsuspended for "+str(self))
+            logger.error("Invalid pumpsuspendedRaw in Pumpsuspended for " + str(self))
             logger.error(e)
             return None
 
-    CalculationavailableMap = {
-        "0": "FALSE",
-        "1": "TRUE"
-    }
+    CalculationavailableMap = {"0": "FALSE", "1": "TRUE"}
 
     class CalculationavailableEnum(Enum):
         FalseVal = 0
@@ -2783,14 +2747,11 @@ class LidAaPcmChange(BaseEvent):
         try:
             return self.CalculationavailableEnum(self.calculationavailableRaw)
         except ValueError as e:
-            logger.error("Invalid calculationavailableRaw in Calculationavailable for "+str(self))
+            logger.error("Invalid calculationavailableRaw in Calculationavailable for " + str(self))
             logger.error(e)
             return None
 
-    CgmavailableMap = {
-        "0": "FALSE",
-        "1": "TRUE"
-    }
+    CgmavailableMap = {"0": "FALSE", "1": "TRUE"}
 
     class CgmavailableEnum(Enum):
         FalseVal = 0
@@ -2801,14 +2762,11 @@ class LidAaPcmChange(BaseEvent):
         try:
             return self.CgmavailableEnum(self.cgmavailableRaw)
         except ValueError as e:
-            logger.error("Invalid cgmavailableRaw in Cgmavailable for "+str(self))
+            logger.error("Invalid cgmavailableRaw in Cgmavailable for " + str(self))
             logger.error(e)
             return None
 
-    ClosedlooppreferredMap = {
-        "0": "FALSE",
-        "1": "TRUE"
-    }
+    ClosedlooppreferredMap = {"0": "FALSE", "1": "TRUE"}
 
     class ClosedlooppreferredEnum(Enum):
         FalseVal = 0
@@ -2819,14 +2777,11 @@ class LidAaPcmChange(BaseEvent):
         try:
             return self.ClosedlooppreferredEnum(self.closedlooppreferredRaw)
         except ValueError as e:
-            logger.error("Invalid closedlooppreferredRaw in Closedlooppreferred for "+str(self))
+            logger.error("Invalid closedlooppreferredRaw in Closedlooppreferred for " + str(self))
             logger.error(e)
             return None
 
-    SufficientclosedloopparamsMap = {
-        "0": "FALSE",
-        "1": "TRUE"
-    }
+    SufficientclosedloopparamsMap = {"0": "FALSE", "1": "TRUE"}
 
     class SufficientclosedloopparamsEnum(Enum):
         FalseVal = 0
@@ -2837,29 +2792,32 @@ class LidAaPcmChange(BaseEvent):
         try:
             return self.SufficientclosedloopparamsEnum(self.sufficientclosedloopparamsRaw)
         except ValueError as e:
-            logger.error("Invalid sufficientclosedloopparamsRaw in Sufficientclosedloopparams for "+str(self))
+            logger.error(
+                "Invalid sufficientclosedloopparamsRaw in Sufficientclosedloopparams for "
+                + str(self)
+            )
             logger.error(e)
             return None
 
     @staticmethod
     def build(raw):
-        currentpcm, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 13)
-        previouspcm, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 12)
-        pumpsuspended, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 11)
-        calculationavailable, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 10)
-        cgmavailable, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 17)
-        closedlooppreferred, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 16)
-        sufficientclosedloopparams, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 15)
+        (currentpcm,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 13)
+        (previouspcm,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 12)
+        (pumpsuspended,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 11)
+        (calculationavailable,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 10)
+        (cgmavailable,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 17)
+        (closedlooppreferred,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 16)
+        (sufficientclosedloopparams,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 15)
 
         return LidAaPcmChange(
-            raw = RawEvent.build(raw),
-            currentpcmRaw = currentpcm,
-            previouspcmRaw = previouspcm,
-            pumpsuspendedRaw = pumpsuspended,
-            calculationavailableRaw = calculationavailable,
-            cgmavailableRaw = cgmavailable,
-            closedlooppreferredRaw = closedlooppreferred,
-            sufficientclosedloopparamsRaw = sufficientclosedloopparams,
+            raw=RawEvent.build(raw),
+            currentpcmRaw=currentpcm,
+            previouspcmRaw=previouspcm,
+            pumpsuspendedRaw=pumpsuspended,
+            calculationavailableRaw=calculationavailable,
+            cgmavailableRaw=cgmavailable,
+            closedlooppreferredRaw=closedlooppreferred,
+            sufficientclosedloopparamsRaw=sufficientclosedloopparams,
         )
 
     @property
@@ -2874,24 +2832,25 @@ class LidAaPcmChange(BaseEvent):
 @dataclass
 class LidCgmDataGxb(BaseEvent):
     """256: LID_CGM_DATA_GXB"""
+
     ID = 256
     NAME = "LID_CGM_DATA_GXB"
 
     raw: RawEvent
     glucosevaluestatusRaw: int
     cgmDataTypeRaw: int
-    rateRaw: int # mg/dL/min
+    rateRaw: int  # mg/dL/min
     algorithmstate: int
-    RSSI: int # dBm
-    currentglucosedisplayvalue: int # mg/dL
-    egvTimestamp: int # sec
+    RSSI: int  # dBm
+    currentglucosedisplayvalue: int  # mg/dL
+    egvTimestamp: int  # sec
     egvInfoBitmaskRaw: int
     interval: int
 
     GlucosevaluestatusMap = {
-        "0": "\"currentGlucoseDisplayValue\" contains the glucose reading",
-        "1": "The glucose reading is \"high\", \"currentGlucoseDisplayValue\" set to 0",
-        "2": "The glucose reading is \"low\", \"currentGlucoseDisplayValue\" set to 0"
+        "0": '"currentGlucoseDisplayValue" contains the glucose reading',
+        "1": 'The glucose reading is "high", "currentGlucoseDisplayValue" set to 0',
+        "2": 'The glucose reading is "low", "currentGlucoseDisplayValue" set to 0',
     }
 
     class GlucosevaluestatusEnum(Enum):
@@ -2904,7 +2863,7 @@ class LidCgmDataGxb(BaseEvent):
         try:
             return self.GlucosevaluestatusEnum(self.glucosevaluestatusRaw)
         except ValueError as e:
-            logger.error("Invalid glucosevaluestatusRaw in Glucosevaluestatus for "+str(self))
+            logger.error("Invalid glucosevaluestatusRaw in Glucosevaluestatus for " + str(self))
             logger.error(e)
             return None
 
@@ -2913,7 +2872,7 @@ class LidCgmDataGxb(BaseEvent):
         "1": "BackFill",
         "2": "Immediate Match Value",
         "3": "Calibration",
-        "4": "None"
+        "4": "None",
     }
 
     class CgmdatatypeBitmask(IntFlag):
@@ -2928,7 +2887,7 @@ class LidCgmDataGxb(BaseEvent):
         try:
             return self.CgmdatatypeBitmask(self.cgmDataTypeRaw)
         except ValueError as e:
-            logger.error("Invalid cgmDataTypeRaw in CgmdatatypeBitmask for "+str(self))
+            logger.error("Invalid cgmDataTypeRaw in CgmdatatypeBitmask for " + str(self))
             logger.error(e)
             return None
 
@@ -2945,7 +2904,7 @@ class LidCgmDataGxb(BaseEvent):
         "5": "Valid timestamp",
         "6": "Valid EGV (valid range)",
         "7": "Valid algState (algState is 6, 7, or 14)",
-        "8": "EGV was successfully added to CGM subsystem array (e.g.,"
+        "8": "EGV was successfully added to CGM subsystem array (e.g.,",
     }
 
     class EgvinfobitmaskBitmask(IntFlag):
@@ -2964,33 +2923,33 @@ class LidCgmDataGxb(BaseEvent):
         try:
             return self.EgvinfobitmaskBitmask(self.egvInfoBitmaskRaw)
         except ValueError as e:
-            logger.error("Invalid egvInfoBitmaskRaw in EgvinfobitmaskBitmask for "+str(self))
+            logger.error("Invalid egvInfoBitmaskRaw in EgvinfobitmaskBitmask for " + str(self))
             logger.error(e)
             return None
 
     @staticmethod
     def build(raw):
-        glucosevaluestatus, = struct.unpack_from(UINT16, raw[:EVENT_LEN], 12)
-        cgmDataType, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 11)
-        rate, = struct.unpack_from(INT8, raw[:EVENT_LEN], 10)
-        algorithmstate, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 17)
-        RSSI, = struct.unpack_from(INT8, raw[:EVENT_LEN], 16)
-        currentglucosedisplayvalue, = struct.unpack_from(UINT16, raw[:EVENT_LEN], 14)
-        egvTimestamp, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 18)
-        egvInfoBitmask, = struct.unpack_from(UINT16, raw[:EVENT_LEN], 24)
-        interval, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 23)
+        (glucosevaluestatus,) = struct.unpack_from(UINT16, raw[:EVENT_LEN], 12)
+        (cgmDataType,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 11)
+        (rate,) = struct.unpack_from(INT8, raw[:EVENT_LEN], 10)
+        (algorithmstate,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 17)
+        (RSSI,) = struct.unpack_from(INT8, raw[:EVENT_LEN], 16)
+        (currentglucosedisplayvalue,) = struct.unpack_from(UINT16, raw[:EVENT_LEN], 14)
+        (egvTimestamp,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 18)
+        (egvInfoBitmask,) = struct.unpack_from(UINT16, raw[:EVENT_LEN], 24)
+        (interval,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 23)
 
         return LidCgmDataGxb(
-            raw = RawEvent.build(raw),
-            glucosevaluestatusRaw = glucosevaluestatus,
-            cgmDataTypeRaw = cgmDataType,
-            rateRaw = rate,
-            algorithmstate = algorithmstate,
-            RSSI = RSSI,
-            currentglucosedisplayvalue = currentglucosedisplayvalue,
-            egvTimestamp = egvTimestamp,
-            egvInfoBitmaskRaw = egvInfoBitmask,
-            interval = interval,
+            raw=RawEvent.build(raw),
+            glucosevaluestatusRaw=glucosevaluestatus,
+            cgmDataTypeRaw=cgmDataType,
+            rateRaw=rate,
+            algorithmstate=algorithmstate,
+            RSSI=RSSI,
+            currentglucosedisplayvalue=currentglucosedisplayvalue,
+            egvTimestamp=egvTimestamp,
+            egvInfoBitmaskRaw=egvInfoBitmask,
+            interval=interval,
         )
 
     @property
@@ -3005,22 +2964,23 @@ class LidCgmDataGxb(BaseEvent):
 @dataclass
 class LidBasalDelivery(BaseEvent):
     """279: LID_BASAL_DELIVERY"""
+
     ID = 279
     NAME = "LID_BASAL_DELIVERY"
 
     raw: RawEvent
     commandedRateSourceRaw: int
-    commandedRate: int # milliunits/hr
-    profileBasalRate: int # milliunits/hr
-    algorithmRate: int # milliunits/hr
-    tempRate: int # milliunits/hr
+    commandedRate: int  # milliunits/hr
+    profileBasalRate: int  # milliunits/hr
+    algorithmRate: int  # milliunits/hr
+    tempRate: int  # milliunits/hr
 
     CommandedratesourceMap = {
         "0": "Suspended",
         "1": "Profile",
         "2": "Temp Rate",
         "3": "Algorithm",
-        "4": "Temp Rate and Algorithm"
+        "4": "Temp Rate and Algorithm",
     }
 
     class CommandedratesourceEnum(Enum):
@@ -3035,25 +2995,25 @@ class LidBasalDelivery(BaseEvent):
         try:
             return self.CommandedratesourceEnum(self.commandedRateSourceRaw)
         except ValueError as e:
-            logger.error("Invalid commandedRateSourceRaw in Commandedratesource for "+str(self))
+            logger.error("Invalid commandedRateSourceRaw in Commandedratesource for " + str(self))
             logger.error(e)
             return None
 
     @staticmethod
     def build(raw):
-        commandedRateSource, = struct.unpack_from(UINT16, raw[:EVENT_LEN], 12)
-        commandedRate, = struct.unpack_from(UINT16, raw[:EVENT_LEN], 16)
-        profileBasalRate, = struct.unpack_from(UINT16, raw[:EVENT_LEN], 14)
-        algorithmRate, = struct.unpack_from(UINT16, raw[:EVENT_LEN], 20)
-        tempRate, = struct.unpack_from(UINT16, raw[:EVENT_LEN], 18)
+        (commandedRateSource,) = struct.unpack_from(UINT16, raw[:EVENT_LEN], 12)
+        (commandedRate,) = struct.unpack_from(UINT16, raw[:EVENT_LEN], 16)
+        (profileBasalRate,) = struct.unpack_from(UINT16, raw[:EVENT_LEN], 14)
+        (algorithmRate,) = struct.unpack_from(UINT16, raw[:EVENT_LEN], 20)
+        (tempRate,) = struct.unpack_from(UINT16, raw[:EVENT_LEN], 18)
 
         return LidBasalDelivery(
-            raw = RawEvent.build(raw),
-            commandedRateSourceRaw = commandedRateSource,
-            commandedRate = commandedRate,
-            profileBasalRate = profileBasalRate,
-            algorithmRate = algorithmRate,
-            tempRate = tempRate,
+            raw=RawEvent.build(raw),
+            commandedRateSourceRaw=commandedRateSource,
+            commandedRate=commandedRate,
+            profileBasalRate=profileBasalRate,
+            algorithmRate=algorithmRate,
+            tempRate=tempRate,
         )
 
     @property
@@ -3068,6 +3028,7 @@ class LidBasalDelivery(BaseEvent):
 @dataclass
 class LidBolusDelivery(BaseEvent):
     """280: LID_BOLUS_DELIVERY"""
+
     ID = 280
     NAME = "LID_BOLUS_DELIVERY"
 
@@ -3077,16 +3038,13 @@ class LidBolusDelivery(BaseEvent):
     bolusTypeRaw: int
     bolusSourceRaw: int
     remoteId: int
-    requestedNow: int # milliunits
-    requestedLater: int # milliunits
-    extendedDurationRequested: int # minutes
-    deliveredTotal: int # milliunits
-    correction: int # milliunits
+    requestedNow: int  # milliunits
+    requestedLater: int  # milliunits
+    extendedDurationRequested: int  # minutes
+    deliveredTotal: int  # milliunits
+    correction: int  # milliunits
 
-    BolusdeliverystatusMap = {
-        "0": "Bolus Completed",
-        "1": "Bolus Started"
-    }
+    BolusdeliverystatusMap = {"0": "Bolus Completed", "1": "Bolus Started"}
 
     class BolusdeliverystatusEnum(Enum):
         BolusCompleted = 0
@@ -3097,7 +3055,7 @@ class LidBolusDelivery(BaseEvent):
         try:
             return self.BolusdeliverystatusEnum(self.bolusDeliveryStatusRaw)
         except ValueError as e:
-            logger.error("Invalid bolusDeliveryStatusRaw in Bolusdeliverystatus for "+str(self))
+            logger.error("Invalid bolusDeliveryStatusRaw in Bolusdeliverystatus for " + str(self))
             logger.error(e)
             return None
 
@@ -3107,7 +3065,7 @@ class LidBolusDelivery(BaseEvent):
         "2": "Override",
         "3": "Correction",
         "4": "Carb",
-        "5": "Eating Soon Mode"
+        "5": "Eating Soon Mode",
     }
 
     class BolustypeBitmask(IntFlag):
@@ -3123,7 +3081,7 @@ class LidBolusDelivery(BaseEvent):
         try:
             return self.BolustypeBitmask(self.bolusTypeRaw)
         except ValueError as e:
-            logger.error("Invalid bolusTypeRaw in BolustypeBitmask for "+str(self))
+            logger.error("Invalid bolusTypeRaw in BolustypeBitmask for " + str(self))
             logger.error(e)
             return None
 
@@ -3137,7 +3095,7 @@ class LidBolusDelivery(BaseEvent):
         "6": "Reserved",
         "7": "Algorithm",
         "8": "BLE",
-        "9": "Eating Soon Bolus"
+        "9": "Eating Soon Bolus",
     }
 
     class BolussourceEnum(Enum):
@@ -3153,35 +3111,35 @@ class LidBolusDelivery(BaseEvent):
         try:
             return self.BolussourceEnum(self.bolusSourceRaw)
         except ValueError as e:
-            logger.error("Invalid bolusSourceRaw in Bolussource for "+str(self))
+            logger.error("Invalid bolusSourceRaw in Bolussource for " + str(self))
             logger.error(e)
             return None
 
     @staticmethod
     def build(raw):
-        bolusid, = struct.unpack_from(UINT16, raw[:EVENT_LEN], 12)
-        bolusDeliveryStatus, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 11)
-        bolusType, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 10)
-        bolusSource, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 17)
-        remoteId, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 16)
-        requestedNow, = struct.unpack_from(UINT16, raw[:EVENT_LEN], 14)
-        requestedLater, = struct.unpack_from(UINT16, raw[:EVENT_LEN], 20)
-        extendedDurationRequested, = struct.unpack_from(UINT16, raw[:EVENT_LEN], 24)
-        deliveredTotal, = struct.unpack_from(UINT16, raw[:EVENT_LEN], 22)
-        correction, = struct.unpack_from(UINT16, raw[:EVENT_LEN], 18)
+        (bolusid,) = struct.unpack_from(UINT16, raw[:EVENT_LEN], 12)
+        (bolusDeliveryStatus,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 11)
+        (bolusType,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 10)
+        (bolusSource,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 17)
+        (remoteId,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 16)
+        (requestedNow,) = struct.unpack_from(UINT16, raw[:EVENT_LEN], 14)
+        (requestedLater,) = struct.unpack_from(UINT16, raw[:EVENT_LEN], 20)
+        (extendedDurationRequested,) = struct.unpack_from(UINT16, raw[:EVENT_LEN], 24)
+        (deliveredTotal,) = struct.unpack_from(UINT16, raw[:EVENT_LEN], 22)
+        (correction,) = struct.unpack_from(UINT16, raw[:EVENT_LEN], 18)
 
         return LidBolusDelivery(
-            raw = RawEvent.build(raw),
-            bolusid = bolusid,
-            bolusDeliveryStatusRaw = bolusDeliveryStatus,
-            bolusTypeRaw = bolusType,
-            bolusSourceRaw = bolusSource,
-            remoteId = remoteId,
-            requestedNow = requestedNow,
-            requestedLater = requestedLater,
-            extendedDurationRequested = extendedDurationRequested,
-            deliveredTotal = deliveredTotal,
-            correction = correction,
+            raw=RawEvent.build(raw),
+            bolusid=bolusid,
+            bolusDeliveryStatusRaw=bolusDeliveryStatus,
+            bolusTypeRaw=bolusType,
+            bolusSourceRaw=bolusSource,
+            remoteId=remoteId,
+            requestedNow=requestedNow,
+            requestedLater=requestedLater,
+            extendedDurationRequested=extendedDurationRequested,
+            deliveredTotal=deliveredTotal,
+            correction=correction,
         )
 
     @property
@@ -3196,6 +3154,7 @@ class LidBolusDelivery(BaseEvent):
 @dataclass
 class LidVersionsA(BaseEvent):
     """307: LID_VERSIONS_A"""
+
     ID = 307
     NAME = "LID_VERSIONS_A"
 
@@ -3205,20 +3164,19 @@ class LidVersionsA(BaseEvent):
     blepartnumber: int
     bleswversion: int
 
-
     @staticmethod
     def build(raw):
-        armpartnumber, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
-        armswversion, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 14)
-        blepartnumber, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 18)
-        bleswversion, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 22)
+        (armpartnumber,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
+        (armswversion,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 14)
+        (blepartnumber,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 18)
+        (bleswversion,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 22)
 
         return LidVersionsA(
-            raw = RawEvent.build(raw),
-            armpartnumber = armpartnumber,
-            armswversion = armswversion,
-            blepartnumber = blepartnumber,
-            bleswversion = bleswversion,
+            raw=RawEvent.build(raw),
+            armpartnumber=armpartnumber,
+            armswversion=armswversion,
+            blepartnumber=blepartnumber,
+            bleswversion=bleswversion,
         )
 
     @property
@@ -3233,6 +3191,7 @@ class LidVersionsA(BaseEvent):
 @dataclass
 class LidAaDailyStatus(BaseEvent):
     """313: LID_AA_DAILY_STATUS"""
+
     ID = 313
     NAME = "LID_AA_DAILY_STATUS"
 
@@ -3245,7 +3204,7 @@ class LidAaDailyStatus(BaseEvent):
         "0": "PCM No Control (No cartridge installed)",
         "1": "PCM Open Loop",
         "2": "PCM Pining",
-        "3": "PCM Closed Loop"
+        "3": "PCM Closed Loop",
     }
 
     class PumpcontrolstateEnum(Enum):
@@ -3259,15 +3218,11 @@ class LidAaDailyStatus(BaseEvent):
         try:
             return self.PumpcontrolstateEnum(self.pumpcontrolstateRaw)
         except ValueError as e:
-            logger.error("Invalid pumpcontrolstateRaw in Pumpcontrolstate for "+str(self))
+            logger.error("Invalid pumpcontrolstateRaw in Pumpcontrolstate for " + str(self))
             logger.error(e)
             return None
 
-    UsermodeMap = {
-        "0": "Normal",
-        "1": "Sleeping",
-        "2": "Exercising"
-    }
+    UsermodeMap = {"0": "Normal", "1": "Sleeping", "2": "Exercising"}
 
     class UsermodeEnum(Enum):
         Normal = 0
@@ -3279,7 +3234,7 @@ class LidAaDailyStatus(BaseEvent):
         try:
             return self.UsermodeEnum(self.usermodeRaw)
         except ValueError as e:
-            logger.error("Invalid usermodeRaw in Usermode for "+str(self))
+            logger.error("Invalid usermodeRaw in Usermode for " + str(self))
             logger.error(e)
             return None
 
@@ -3287,7 +3242,7 @@ class LidAaDailyStatus(BaseEvent):
         "0": "CGM_TYPE_NONE",
         "1": "CGM_TYPE_DEXCOM_G6",
         "2": "CGM_TYPE_LIBRE2",
-        "3": "CGM_TYPE_DEXCOM_G7"
+        "3": "CGM_TYPE_DEXCOM_G7",
     }
 
     class SensortypeEnum(Enum):
@@ -3301,21 +3256,21 @@ class LidAaDailyStatus(BaseEvent):
         try:
             return self.SensortypeEnum(self.sensortypeRaw)
         except ValueError as e:
-            logger.error("Invalid sensortypeRaw in Sensortype for "+str(self))
+            logger.error("Invalid sensortypeRaw in Sensortype for " + str(self))
             logger.error(e)
             return None
 
     @staticmethod
     def build(raw):
-        pumpcontrolstate, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 13)
-        usermode, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 12)
-        sensortype, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 11)
+        (pumpcontrolstate,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 13)
+        (usermode,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 12)
+        (sensortype,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 11)
 
         return LidAaDailyStatus(
-            raw = RawEvent.build(raw),
-            pumpcontrolstateRaw = pumpcontrolstate,
-            usermodeRaw = usermode,
-            sensortypeRaw = sensortype,
+            raw=RawEvent.build(raw),
+            pumpcontrolstateRaw=pumpcontrolstate,
+            usermodeRaw=usermode,
+            sensortypeRaw=sensortype,
         )
 
     @property
@@ -3330,6 +3285,7 @@ class LidAaDailyStatus(BaseEvent):
 @dataclass
 class LidCgmAlertActivatedDex(BaseEvent):
     """369: LID_CGM_ALERT_ACTIVATED_DEX"""
+
     ID = 369
     NAME = "LID_CGM_ALERT_ACTIVATED_DEX"
 
@@ -3348,7 +3304,7 @@ class LidCgmAlertActivatedDex(BaseEvent):
         "26": "CGM Temperature",
         "27": "CGM Failed Connection",
         "39": "CGM Transmitter Expired",
-        "40": "Pump Bluetooth Error"
+        "40": "Pump Bluetooth Error",
     }
 
     class DalertidEnum(Enum):
@@ -3366,15 +3322,11 @@ class LidCgmAlertActivatedDex(BaseEvent):
         try:
             return self.DalertidEnum(self.dalertidRaw)
         except ValueError as e:
-            logger.error("Invalid dalertidRaw in Dalertid for "+str(self))
+            logger.error("Invalid dalertidRaw in Dalertid for " + str(self))
             logger.error(e)
             return None
 
-    SensortypeMap = {
-        "0": "Invalid",
-        "1": "CGM_TYPE_DEXCOM_G6",
-        "3": "CGM_TYPE_DEXCOM_G7"
-    }
+    SensortypeMap = {"0": "Invalid", "1": "CGM_TYPE_DEXCOM_G6", "3": "CGM_TYPE_DEXCOM_G7"}
 
     class SensortypeEnum(Enum):
         Invalid = 0
@@ -3386,25 +3338,25 @@ class LidCgmAlertActivatedDex(BaseEvent):
         try:
             return self.SensortypeEnum(self.sensortypeRaw)
         except ValueError as e:
-            logger.error("Invalid sensortypeRaw in Sensortype for "+str(self))
+            logger.error("Invalid sensortypeRaw in Sensortype for " + str(self))
             logger.error(e)
             return None
 
     @staticmethod
     def build(raw):
-        dalertid, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 13)
-        sensortype, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 12)
-        faultlocatordata, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 14)
-        param1, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 18)
-        param2, = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 22)
+        (dalertid,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 13)
+        (sensortype,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 12)
+        (faultlocatordata,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 14)
+        (param1,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 18)
+        (param2,) = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 22)
 
         return LidCgmAlertActivatedDex(
-            raw = RawEvent.build(raw),
-            dalertidRaw = dalertid,
-            sensortypeRaw = sensortype,
-            faultlocatordata = faultlocatordata,
-            param1 = param1,
-            param2 = param2,
+            raw=RawEvent.build(raw),
+            dalertidRaw=dalertid,
+            sensortypeRaw=sensortype,
+            faultlocatordata=faultlocatordata,
+            param1=param1,
+            param2=param2,
         )
 
     @property
@@ -3419,6 +3371,7 @@ class LidCgmAlertActivatedDex(BaseEvent):
 @dataclass
 class LidCgmAlertClearedDex(BaseEvent):
     """370: LID_CGM_ALERT_CLEARED_DEX"""
+
     ID = 370
     NAME = "LID_CGM_ALERT_CLEARED_DEX"
 
@@ -3434,7 +3387,7 @@ class LidCgmAlertClearedDex(BaseEvent):
         "26": "CGM Temperature",
         "27": "CGM Failed Connection",
         "39": "CGM Transmitter Expired",
-        "40": "Pump Bluetooth Error"
+        "40": "Pump Bluetooth Error",
     }
 
     class DalertidEnum(Enum):
@@ -3452,15 +3405,11 @@ class LidCgmAlertClearedDex(BaseEvent):
         try:
             return self.DalertidEnum(self.dalertidRaw)
         except ValueError as e:
-            logger.error("Invalid dalertidRaw in Dalertid for "+str(self))
+            logger.error("Invalid dalertidRaw in Dalertid for " + str(self))
             logger.error(e)
             return None
 
-    SensortypeMap = {
-        "0": "Invalid",
-        "1": "CGM_TYPE_DEXCOM_G6",
-        "3": "CGM_TYPE_DEXCOM_G7"
-    }
+    SensortypeMap = {"0": "Invalid", "1": "CGM_TYPE_DEXCOM_G6", "3": "CGM_TYPE_DEXCOM_G7"}
 
     class SensortypeEnum(Enum):
         Invalid = 0
@@ -3472,19 +3421,19 @@ class LidCgmAlertClearedDex(BaseEvent):
         try:
             return self.SensortypeEnum(self.sensortypeRaw)
         except ValueError as e:
-            logger.error("Invalid sensortypeRaw in Sensortype for "+str(self))
+            logger.error("Invalid sensortypeRaw in Sensortype for " + str(self))
             logger.error(e)
             return None
 
     @staticmethod
     def build(raw):
-        dalertid, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 13)
-        sensortype, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 12)
+        (dalertid,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 13)
+        (sensortype,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 12)
 
         return LidCgmAlertClearedDex(
-            raw = RawEvent.build(raw),
-            dalertidRaw = dalertid,
-            sensortypeRaw = sensortype,
+            raw=RawEvent.build(raw),
+            dalertidRaw=dalertid,
+            sensortypeRaw=sensortype,
         )
 
     @property
@@ -3499,6 +3448,7 @@ class LidCgmAlertClearedDex(BaseEvent):
 @dataclass
 class LidCgmAlertAckDex(BaseEvent):
     """371: LID_CGM_ALERT_ACK_DEX"""
+
     ID = 371
     NAME = "LID_CGM_ALERT_ACK_DEX"
 
@@ -3515,7 +3465,7 @@ class LidCgmAlertAckDex(BaseEvent):
         "26": "CGM Temperature",
         "27": "CGM Failed Connection",
         "39": "CGM Transmitter Expired",
-        "40": "Pump Bluetooth Error"
+        "40": "Pump Bluetooth Error",
     }
 
     class DalertidEnum(Enum):
@@ -3533,15 +3483,11 @@ class LidCgmAlertAckDex(BaseEvent):
         try:
             return self.DalertidEnum(self.dalertidRaw)
         except ValueError as e:
-            logger.error("Invalid dalertidRaw in Dalertid for "+str(self))
+            logger.error("Invalid dalertidRaw in Dalertid for " + str(self))
             logger.error(e)
             return None
 
-    SensortypeMap = {
-        "0": "Invalid",
-        "1": "CGM_TYPE_DEXCOM_G6",
-        "3": "CGM_TYPE_DEXCOM_G7"
-    }
+    SensortypeMap = {"0": "Invalid", "1": "CGM_TYPE_DEXCOM_G6", "3": "CGM_TYPE_DEXCOM_G7"}
 
     class SensortypeEnum(Enum):
         Invalid = 0
@@ -3553,14 +3499,11 @@ class LidCgmAlertAckDex(BaseEvent):
         try:
             return self.SensortypeEnum(self.sensortypeRaw)
         except ValueError as e:
-            logger.error("Invalid sensortypeRaw in Sensortype for "+str(self))
+            logger.error("Invalid sensortypeRaw in Sensortype for " + str(self))
             logger.error(e)
             return None
 
-    AcksourceMap = {
-        "0": "Alert Acknowledged by User",
-        "1": "Alert Acknowledged by Software"
-    }
+    AcksourceMap = {"0": "Alert Acknowledged by User", "1": "Alert Acknowledged by Software"}
 
     class AcksourceEnum(Enum):
         AlertAcknowledgedByUser = 0
@@ -3571,21 +3514,21 @@ class LidCgmAlertAckDex(BaseEvent):
         try:
             return self.AcksourceEnum(self.acksourceRaw)
         except ValueError as e:
-            logger.error("Invalid acksourceRaw in Acksource for "+str(self))
+            logger.error("Invalid acksourceRaw in Acksource for " + str(self))
             logger.error(e)
             return None
 
     @staticmethod
     def build(raw):
-        dalertid, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 13)
-        sensortype, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 12)
-        acksource, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 14)
+        (dalertid,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 13)
+        (sensortype,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 12)
+        (acksource,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 14)
 
         return LidCgmAlertAckDex(
-            raw = RawEvent.build(raw),
-            dalertidRaw = dalertid,
-            sensortypeRaw = sensortype,
-            acksourceRaw = acksource,
+            raw=RawEvent.build(raw),
+            dalertidRaw=dalertid,
+            sensortypeRaw=sensortype,
+            acksourceRaw=acksource,
         )
 
     @property
@@ -3600,25 +3543,22 @@ class LidCgmAlertAckDex(BaseEvent):
 @dataclass
 class LidCgmDataFsl2(BaseEvent):
     """372: LID_CGM_DATA_FSL2"""
+
     ID = 372
     NAME = "LID_CGM_DATA_FSL2"
 
     raw: RawEvent
     glucosevaluestatusRaw: int
     cgmDataTypeRaw: int
-    rateRaw: int # mg/dL/min
+    rateRaw: int  # mg/dL/min
     algorithmstateRaw: int
-    RSSI: int # dBm
-    currentglucosedisplayvalue: int # mg/dL
-    egvTimestamp: int # Seconds
+    RSSI: int  # dBm
+    currentglucosedisplayvalue: int  # mg/dL
+    egvTimestamp: int  # Seconds
     egvInfoBitmaskRaw: int
     interval: int
 
-    GlucosevaluestatusMap = {
-        "0": "Precise Value",
-        "1": "Special High",
-        "2": "Special Low"
-    }
+    GlucosevaluestatusMap = {"0": "Precise Value", "1": "Special High", "2": "Special Low"}
 
     class GlucosevaluestatusEnum(Enum):
         PreciseValue = 0
@@ -3630,7 +3570,7 @@ class LidCgmDataFsl2(BaseEvent):
         try:
             return self.GlucosevaluestatusEnum(self.glucosevaluestatusRaw)
         except ValueError as e:
-            logger.error("Invalid glucosevaluestatusRaw in Glucosevaluestatus for "+str(self))
+            logger.error("Invalid glucosevaluestatusRaw in Glucosevaluestatus for " + str(self))
             logger.error(e)
             return None
 
@@ -3639,7 +3579,7 @@ class LidCgmDataFsl2(BaseEvent):
         "1": "Backfill",
         "4": "None",
         "5": "One Minute Reading (OMR)",
-        "6": "Real Time Reading"
+        "6": "Real Time Reading",
     }
 
     class CgmdatatypeBitmask(IntFlag):
@@ -3654,7 +3594,7 @@ class LidCgmDataFsl2(BaseEvent):
         try:
             return self.CgmdatatypeBitmask(self.cgmDataTypeRaw)
         except ValueError as e:
-            logger.error("Invalid cgmDataTypeRaw in CgmdatatypeBitmask for "+str(self))
+            logger.error("Invalid cgmDataTypeRaw in CgmdatatypeBitmask for " + str(self))
             logger.error(e)
             return None
 
@@ -3670,7 +3610,7 @@ class LidCgmDataFsl2(BaseEvent):
         "103": "Temp High State",
         "104": "Temp Low State",
         "105": "Invalid Data State",
-        "106": "Other State"
+        "106": "Other State",
     }
 
     class AlgorithmstateEnum(Enum):
@@ -3688,7 +3628,7 @@ class LidCgmDataFsl2(BaseEvent):
         try:
             return self.AlgorithmstateEnum(self.algorithmstateRaw)
         except ValueError as e:
-            logger.error("Invalid algorithmstateRaw in Algorithmstate for "+str(self))
+            logger.error("Invalid algorithmstateRaw in Algorithmstate for " + str(self))
             logger.error(e)
             return None
 
@@ -3703,7 +3643,7 @@ class LidCgmDataFsl2(BaseEvent):
         "7": "Valid algState (algState is 100)",
         "8": "EGV was successfully added to CGM subsystem array (e.g., not a duplicate)",
         "9": "OMR reading type",
-        "10": "Real Time Reading from NFC scan"
+        "10": "Real Time Reading from NFC scan",
     }
 
     class EgvinfobitmaskBitmask(IntFlag):
@@ -3724,33 +3664,33 @@ class LidCgmDataFsl2(BaseEvent):
         try:
             return self.EgvinfobitmaskBitmask(self.egvInfoBitmaskRaw)
         except ValueError as e:
-            logger.error("Invalid egvInfoBitmaskRaw in EgvinfobitmaskBitmask for "+str(self))
+            logger.error("Invalid egvInfoBitmaskRaw in EgvinfobitmaskBitmask for " + str(self))
             logger.error(e)
             return None
 
     @staticmethod
     def build(raw):
-        glucosevaluestatus, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 13)
-        cgmDataType, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 12)
-        rate, = struct.unpack_from(INT16, raw[:EVENT_LEN], 10)
-        algorithmstate, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 17)
-        RSSI, = struct.unpack_from(INT8, raw[:EVENT_LEN], 16)
-        currentglucosedisplayvalue, = struct.unpack_from(UINT16, raw[:EVENT_LEN], 14)
-        egvTimestamp, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 18)
-        egvInfoBitmask, = struct.unpack_from(UINT16, raw[:EVENT_LEN], 24)
-        interval, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 23)
+        (glucosevaluestatus,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 13)
+        (cgmDataType,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 12)
+        (rate,) = struct.unpack_from(INT16, raw[:EVENT_LEN], 10)
+        (algorithmstate,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 17)
+        (RSSI,) = struct.unpack_from(INT8, raw[:EVENT_LEN], 16)
+        (currentglucosedisplayvalue,) = struct.unpack_from(UINT16, raw[:EVENT_LEN], 14)
+        (egvTimestamp,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 18)
+        (egvInfoBitmask,) = struct.unpack_from(UINT16, raw[:EVENT_LEN], 24)
+        (interval,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 23)
 
         return LidCgmDataFsl2(
-            raw = RawEvent.build(raw),
-            glucosevaluestatusRaw = glucosevaluestatus,
-            cgmDataTypeRaw = cgmDataType,
-            rateRaw = rate,
-            algorithmstateRaw = algorithmstate,
-            RSSI = RSSI,
-            currentglucosedisplayvalue = currentglucosedisplayvalue,
-            egvTimestamp = egvTimestamp,
-            egvInfoBitmaskRaw = egvInfoBitmask,
-            interval = interval,
+            raw=RawEvent.build(raw),
+            glucosevaluestatusRaw=glucosevaluestatus,
+            cgmDataTypeRaw=cgmDataType,
+            rateRaw=rate,
+            algorithmstateRaw=algorithmstate,
+            RSSI=RSSI,
+            currentglucosedisplayvalue=currentglucosedisplayvalue,
+            egvTimestamp=egvTimestamp,
+            egvInfoBitmaskRaw=egvInfoBitmask,
+            interval=interval,
         )
 
     @property
@@ -3765,23 +3705,23 @@ class LidCgmDataFsl2(BaseEvent):
 @dataclass
 class LidCgmJoinSessionG7(BaseEvent):
     """394: LID_CGM_JOIN_SESSION_G7"""
+
     ID = 394
     NAME = "LID_CGM_JOIN_SESSION_G7"
 
     raw: RawEvent
-    cgmtimestamp: int # Seconds
-    sessionsignature: int # Seconds
-
+    cgmtimestamp: int  # Seconds
+    sessionsignature: int  # Seconds
 
     @staticmethod
     def build(raw):
-        cgmtimestamp, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
-        sessionsignature, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 14)
+        (cgmtimestamp,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
+        (sessionsignature,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 14)
 
         return LidCgmJoinSessionG7(
-            raw = RawEvent.build(raw),
-            cgmtimestamp = cgmtimestamp,
-            sessionsignature = sessionsignature,
+            raw=RawEvent.build(raw),
+            cgmtimestamp=cgmtimestamp,
+            sessionsignature=sessionsignature,
         )
 
     @property
@@ -3796,17 +3736,18 @@ class LidCgmJoinSessionG7(BaseEvent):
 @dataclass
 class LidCgmDataG7(BaseEvent):
     """399: LID_CGM_DATA_G7"""
+
     ID = 399
     NAME = "LID_CGM_DATA_G7"
 
     raw: RawEvent
     glucosevaluestatusRaw: int
     cgmDataTypeRaw: int
-    rateRaw: int # mg/dL/min/10
+    rateRaw: int  # mg/dL/min/10
     algorithmstateRaw: int
-    RSSI: int # dBm
-    currentglucosedisplayvalue: int # mg/dL
-    egvTimestamp: int # sec
+    RSSI: int  # dBm
+    currentglucosedisplayvalue: int  # mg/dL
+    egvTimestamp: int  # sec
     egvInfoBitmaskRaw: int
     interval: int
 
@@ -3814,7 +3755,7 @@ class LidCgmDataG7(BaseEvent):
         "0": "Precise Value",
         "1": "Special High",
         "2": "Special Low",
-        "6": "Do Not Show"
+        "6": "Do Not Show",
     }
 
     class GlucosevaluestatusEnum(Enum):
@@ -3828,7 +3769,7 @@ class LidCgmDataG7(BaseEvent):
         try:
             return self.GlucosevaluestatusEnum(self.glucosevaluestatusRaw)
         except ValueError as e:
-            logger.error("Invalid glucosevaluestatusRaw in Glucosevaluestatus for "+str(self))
+            logger.error("Invalid glucosevaluestatusRaw in Glucosevaluestatus for " + str(self))
             logger.error(e)
             return None
 
@@ -3837,7 +3778,7 @@ class LidCgmDataG7(BaseEvent):
         "1": "Backfill",
         "2": "IMM No longer applies",
         "3": "Calibration",
-        "4": "None"
+        "4": "None",
     }
 
     class CgmdatatypeBitmask(IntFlag):
@@ -3852,7 +3793,7 @@ class LidCgmDataG7(BaseEvent):
         try:
             return self.CgmdatatypeBitmask(self.cgmDataTypeRaw)
         except ValueError as e:
-            logger.error("Invalid cgmDataTypeRaw in CgmdatatypeBitmask for "+str(self))
+            logger.error("Invalid cgmDataTypeRaw in CgmdatatypeBitmask for " + str(self))
             logger.error(e)
             return None
 
@@ -3871,7 +3812,7 @@ class LidCgmDataG7(BaseEvent):
         "36": "Session Stopped (Manual Stop)",
         "37": "Session Stopped (Transmitter Failure)",
         "38": "Session Stopped (SIV Failure)",
-        "39": "Session Stopped (Out of Range / Environmental Conditions Detected)"
+        "39": "Session Stopped (Out of Range / Environmental Conditions Detected)",
     }
 
     class AlgorithmstateEnum(Enum):
@@ -3892,7 +3833,7 @@ class LidCgmDataG7(BaseEvent):
         try:
             return self.AlgorithmstateEnum(self.algorithmstateRaw)
         except ValueError as e:
-            logger.error("Invalid algorithmstateRaw in Algorithmstate for "+str(self))
+            logger.error("Invalid algorithmstateRaw in Algorithmstate for " + str(self))
             logger.error(e)
             return None
 
@@ -3907,7 +3848,7 @@ class LidCgmDataG7(BaseEvent):
         "7": "Valid algState (algState is 32)",
         "8": "EGV was successfully added to CGM subsystem array (e.g.,",
         "9": "Reserved",
-        "10": "Reserved"
+        "10": "Reserved",
     }
 
     class EgvinfobitmaskBitmask(IntFlag):
@@ -3926,33 +3867,33 @@ class LidCgmDataG7(BaseEvent):
         try:
             return self.EgvinfobitmaskBitmask(self.egvInfoBitmaskRaw)
         except ValueError as e:
-            logger.error("Invalid egvInfoBitmaskRaw in EgvinfobitmaskBitmask for "+str(self))
+            logger.error("Invalid egvInfoBitmaskRaw in EgvinfobitmaskBitmask for " + str(self))
             logger.error(e)
             return None
 
     @staticmethod
     def build(raw):
-        glucosevaluestatus, = struct.unpack_from(UINT16, raw[:EVENT_LEN], 12)
-        cgmDataType, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 11)
-        rate, = struct.unpack_from(INT8, raw[:EVENT_LEN], 10)
-        algorithmstate, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 17)
-        RSSI, = struct.unpack_from(INT8, raw[:EVENT_LEN], 16)
-        currentglucosedisplayvalue, = struct.unpack_from(UINT16, raw[:EVENT_LEN], 14)
-        egvTimestamp, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 18)
-        egvInfoBitmask, = struct.unpack_from(UINT16, raw[:EVENT_LEN], 24)
-        interval, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 23)
+        (glucosevaluestatus,) = struct.unpack_from(UINT16, raw[:EVENT_LEN], 12)
+        (cgmDataType,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 11)
+        (rate,) = struct.unpack_from(INT8, raw[:EVENT_LEN], 10)
+        (algorithmstate,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 17)
+        (RSSI,) = struct.unpack_from(INT8, raw[:EVENT_LEN], 16)
+        (currentglucosedisplayvalue,) = struct.unpack_from(UINT16, raw[:EVENT_LEN], 14)
+        (egvTimestamp,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 18)
+        (egvInfoBitmask,) = struct.unpack_from(UINT16, raw[:EVENT_LEN], 24)
+        (interval,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 23)
 
         return LidCgmDataG7(
-            raw = RawEvent.build(raw),
-            glucosevaluestatusRaw = glucosevaluestatus,
-            cgmDataTypeRaw = cgmDataType,
-            rateRaw = rate,
-            algorithmstateRaw = algorithmstate,
-            RSSI = RSSI,
-            currentglucosedisplayvalue = currentglucosedisplayvalue,
-            egvTimestamp = egvTimestamp,
-            egvInfoBitmaskRaw = egvInfoBitmask,
-            interval = interval,
+            raw=RawEvent.build(raw),
+            glucosevaluestatusRaw=glucosevaluestatus,
+            cgmDataTypeRaw=cgmDataType,
+            rateRaw=rate,
+            algorithmstateRaw=algorithmstate,
+            RSSI=RSSI,
+            currentglucosedisplayvalue=currentglucosedisplayvalue,
+            egvTimestamp=egvTimestamp,
+            egvInfoBitmaskRaw=egvInfoBitmask,
+            interval=interval,
         )
 
     @property
@@ -3967,23 +3908,23 @@ class LidCgmDataG7(BaseEvent):
 @dataclass
 class LidCgmStartSessionFsl2(BaseEvent):
     """404: LID_CGM_START_SESSION_FSL2"""
+
     ID = 404
     NAME = "LID_CGM_START_SESSION_FSL2"
 
     raw: RawEvent
-    sessionstarttime: int # sec
-    sessionduration: int # days
-
+    sessionstarttime: int  # sec
+    sessionduration: int  # days
 
     @staticmethod
     def build(raw):
-        sessionstarttime, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
-        sessionduration, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 17)
+        (sessionstarttime,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
+        (sessionduration,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 17)
 
         return LidCgmStartSessionFsl2(
-            raw = RawEvent.build(raw),
-            sessionstarttime = sessionstarttime,
-            sessionduration = sessionduration,
+            raw=RawEvent.build(raw),
+            sessionstarttime=sessionstarttime,
+            sessionduration=sessionduration,
         )
 
     @property
@@ -3998,29 +3939,29 @@ class LidCgmStartSessionFsl2(BaseEvent):
 @dataclass
 class LidCgmStopSessionFsl2(BaseEvent):
     """405: LID_CGM_STOP_SESSION_FSL2"""
+
     ID = 405
     NAME = "LID_CGM_STOP_SESSION_FSL2"
 
     raw: RawEvent
-    sessionstarttime: int # sec
-    sessionstoptime: int # sec
-    sessionduration: int # days
+    sessionstarttime: int  # sec
+    sessionstoptime: int  # sec
+    sessionduration: int  # days
     sessionstopreason: int
-
 
     @staticmethod
     def build(raw):
-        sessionstarttime, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
-        sessionstoptime, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 14)
-        sessionduration, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 21)
-        sessionstopreason, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 20)
+        (sessionstarttime,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
+        (sessionstoptime,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 14)
+        (sessionduration,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 21)
+        (sessionstopreason,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 20)
 
         return LidCgmStopSessionFsl2(
-            raw = RawEvent.build(raw),
-            sessionstarttime = sessionstarttime,
-            sessionstoptime = sessionstoptime,
-            sessionduration = sessionduration,
-            sessionstopreason = sessionstopreason,
+            raw=RawEvent.build(raw),
+            sessionstarttime=sessionstarttime,
+            sessionstoptime=sessionstoptime,
+            sessionduration=sessionduration,
+            sessionstopreason=sessionstopreason,
         )
 
     @property
@@ -4035,29 +3976,29 @@ class LidCgmStopSessionFsl2(BaseEvent):
 @dataclass
 class LidCgmJoinSessionFsl2(BaseEvent):
     """406: LID_CGM_JOIN_SESSION_FSL2"""
+
     ID = 406
     NAME = "LID_CGM_JOIN_SESSION_FSL2"
 
     raw: RawEvent
-    sessionstarttime: int # sec
-    sessionjointime: int # sec
-    sessionduration: int # days
+    sessionstarttime: int  # sec
+    sessionjointime: int  # sec
+    sessionduration: int  # days
     sessionjoinreason: int
-
 
     @staticmethod
     def build(raw):
-        sessionstarttime, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
-        sessionjointime, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 14)
-        sessionduration, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 21)
-        sessionjoinreason, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 20)
+        (sessionstarttime,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
+        (sessionjointime,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 14)
+        (sessionduration,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 21)
+        (sessionjoinreason,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 20)
 
         return LidCgmJoinSessionFsl2(
-            raw = RawEvent.build(raw),
-            sessionstarttime = sessionstarttime,
-            sessionjointime = sessionjointime,
-            sessionduration = sessionduration,
-            sessionjoinreason = sessionjoinreason,
+            raw=RawEvent.build(raw),
+            sessionstarttime=sessionstarttime,
+            sessionjointime=sessionjointime,
+            sessionduration=sessionduration,
+            sessionjoinreason=sessionjoinreason,
         )
 
     @property
@@ -4072,35 +4013,35 @@ class LidCgmJoinSessionFsl2(BaseEvent):
 @dataclass
 class LidCgmStopSessionG7(BaseEvent):
     """447: LID_CGM_STOP_SESSION_G7"""
+
     ID = 447
     NAME = "LID_CGM_STOP_SESSION_G7"
 
     raw: RawEvent
-    currenttransmittertime: int # sec
-    sessionstarttime: int # sec
-    sessionstoptime: int # sec
-    sessionduration: int # days
+    currenttransmittertime: int  # sec
+    sessionstarttime: int  # sec
+    sessionstoptime: int  # sec
+    sessionduration: int  # days
     sessionstopreason: int
     stopsessioncode: int
 
-
     @staticmethod
     def build(raw):
-        currenttransmittertime, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
-        sessionstarttime, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 14)
-        sessionstoptime, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 18)
-        sessionduration, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 25)
-        sessionstopreason, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 24)
-        stopsessioncode, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 23)
+        (currenttransmittertime,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 10)
+        (sessionstarttime,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 14)
+        (sessionstoptime,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 18)
+        (sessionduration,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 25)
+        (sessionstopreason,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 24)
+        (stopsessioncode,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 23)
 
         return LidCgmStopSessionG7(
-            raw = RawEvent.build(raw),
-            currenttransmittertime = currenttransmittertime,
-            sessionstarttime = sessionstarttime,
-            sessionstoptime = sessionstoptime,
-            sessionduration = sessionduration,
-            sessionstopreason = sessionstopreason,
-            stopsessioncode = stopsessioncode,
+            raw=RawEvent.build(raw),
+            currenttransmittertime=currenttransmittertime,
+            sessionstarttime=sessionstarttime,
+            sessionstoptime=sessionstoptime,
+            sessionduration=sessionduration,
+            sessionstopreason=sessionstopreason,
+            stopsessioncode=stopsessioncode,
         )
 
     @property
@@ -4115,6 +4056,7 @@ class LidCgmStopSessionG7(BaseEvent):
 @dataclass
 class LidCgmAlertActivatedFsl2(BaseEvent):
     """460: LID_CGM_ALERT_ACTIVATED_FSL2"""
+
     ID = 460
     NAME = "LID_CGM_ALERT_ACTIVATED_FSL2"
 
@@ -4133,7 +4075,7 @@ class LidCgmAlertActivatedFsl2(BaseEvent):
         "26": "CGM Temperature",
         "27": "CGM Failed Connection",
         "39": "CGM Transmitter Expired",
-        "40": "Pump Bluetooth Error"
+        "40": "Pump Bluetooth Error",
     }
 
     class DalertidEnum(Enum):
@@ -4151,14 +4093,11 @@ class LidCgmAlertActivatedFsl2(BaseEvent):
         try:
             return self.DalertidEnum(self.dalertidRaw)
         except ValueError as e:
-            logger.error("Invalid dalertidRaw in Dalertid for "+str(self))
+            logger.error("Invalid dalertidRaw in Dalertid for " + str(self))
             logger.error(e)
             return None
 
-    SensortypeMap = {
-        "0": "Invalid",
-        "2": "CGM_TYPE_LIBRE2"
-    }
+    SensortypeMap = {"0": "Invalid", "2": "CGM_TYPE_LIBRE2"}
 
     class SensortypeEnum(Enum):
         Invalid = 0
@@ -4169,25 +4108,25 @@ class LidCgmAlertActivatedFsl2(BaseEvent):
         try:
             return self.SensortypeEnum(self.sensortypeRaw)
         except ValueError as e:
-            logger.error("Invalid sensortypeRaw in Sensortype for "+str(self))
+            logger.error("Invalid sensortypeRaw in Sensortype for " + str(self))
             logger.error(e)
             return None
 
     @staticmethod
     def build(raw):
-        dalertid, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 13)
-        sensortype, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 12)
-        faultlocatordata, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 14)
-        param1, = struct.unpack_from(UINT32, raw[:EVENT_LEN], 18)
-        param2, = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 22)
+        (dalertid,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 13)
+        (sensortype,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 12)
+        (faultlocatordata,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 14)
+        (param1,) = struct.unpack_from(UINT32, raw[:EVENT_LEN], 18)
+        (param2,) = struct.unpack_from(FLOAT32, raw[:EVENT_LEN], 22)
 
         return LidCgmAlertActivatedFsl2(
-            raw = RawEvent.build(raw),
-            dalertidRaw = dalertid,
-            sensortypeRaw = sensortype,
-            faultlocatordata = faultlocatordata,
-            param1 = param1,
-            param2 = param2,
+            raw=RawEvent.build(raw),
+            dalertidRaw=dalertid,
+            sensortypeRaw=sensortype,
+            faultlocatordata=faultlocatordata,
+            param1=param1,
+            param2=param2,
         )
 
     @property
@@ -4202,6 +4141,7 @@ class LidCgmAlertActivatedFsl2(BaseEvent):
 @dataclass
 class LidCgmAlertClearedFsl2(BaseEvent):
     """461: LID_CGM_ALERT_CLEARED_FSL2"""
+
     ID = 461
     NAME = "LID_CGM_ALERT_CLEARED_FSL2"
 
@@ -4217,7 +4157,7 @@ class LidCgmAlertClearedFsl2(BaseEvent):
         "26": "CGM Temperature",
         "27": "CGM Failed Connection",
         "39": "CGM Transmitter Expired",
-        "40": "Pump Bluetooth Error"
+        "40": "Pump Bluetooth Error",
     }
 
     class DalertidEnum(Enum):
@@ -4235,14 +4175,11 @@ class LidCgmAlertClearedFsl2(BaseEvent):
         try:
             return self.DalertidEnum(self.dalertidRaw)
         except ValueError as e:
-            logger.error("Invalid dalertidRaw in Dalertid for "+str(self))
+            logger.error("Invalid dalertidRaw in Dalertid for " + str(self))
             logger.error(e)
             return None
 
-    SensortypeMap = {
-        "0": "Invalid",
-        "2": "CGM_TYPE_LIBRE2"
-    }
+    SensortypeMap = {"0": "Invalid", "2": "CGM_TYPE_LIBRE2"}
 
     class SensortypeEnum(Enum):
         Invalid = 0
@@ -4253,19 +4190,19 @@ class LidCgmAlertClearedFsl2(BaseEvent):
         try:
             return self.SensortypeEnum(self.sensortypeRaw)
         except ValueError as e:
-            logger.error("Invalid sensortypeRaw in Sensortype for "+str(self))
+            logger.error("Invalid sensortypeRaw in Sensortype for " + str(self))
             logger.error(e)
             return None
 
     @staticmethod
     def build(raw):
-        dalertid, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 13)
-        sensortype, = struct.unpack_from(UINT8, raw[:EVENT_LEN], 12)
+        (dalertid,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 13)
+        (sensortype,) = struct.unpack_from(UINT8, raw[:EVENT_LEN], 12)
 
         return LidCgmAlertClearedFsl2(
-            raw = RawEvent.build(raw),
-            dalertidRaw = dalertid,
-            sensortypeRaw = sensortype,
+            raw=RawEvent.build(raw),
+            dalertidRaw=dalertid,
+            sensortypeRaw=sensortype,
         )
 
     @property
@@ -4275,6 +4212,7 @@ class LidCgmAlertClearedFsl2(BaseEvent):
     @property
     def eventId(self):
         return self.raw.seqNum
+
 
 EVENT_IDS = {
     3: LidBasalRateChange,
@@ -4385,4 +4323,3 @@ EVENT_NAMES = {
     "LID_CGM_ALERT_ACTIVATED_FSL2": LidCgmAlertActivatedFsl2,
     "LID_CGM_ALERT_CLEARED_FSL2": LidCgmAlertClearedFsl2,
 }
-

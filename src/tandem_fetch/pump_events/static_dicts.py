@@ -1,4 +1,3 @@
-
 ALERTS_DICT = {
     "0": "LOW_INSULIN_ALERT",
     "1": "USB_CONNECTION_ALERT",
@@ -140,5 +139,5 @@ CGM_ALERTS_DICT = {
     "26": "CGM Temperature",
     "27": "CGM Failed Connection",
     "39": "CGM Transmitter Expired",
-    "40": "Pump Bluetooth Error"
+    "40": "Pump Bluetooth Error",
 }

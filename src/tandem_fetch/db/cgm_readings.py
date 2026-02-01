@@ -10,11 +10,7 @@ class CgmReading(Base):
 
     __tablename__ = "cgm_readings"
 
-    id = Column(
-        Integer, Sequence("cgm_readings_id_seq"), primary_key=True, autoincrement=True
-    )
-    events_id = Column(
-        Integer, ForeignKey("events.id"), nullable=False, unique=True
-    )
+    id = Column(Integer, Sequence("cgm_readings_id_seq"), primary_key=True, autoincrement=True)
+    events_id = Column(Integer, ForeignKey("events.id"), nullable=False, unique=True)
     timestamp = Column(DateTime, nullable=False)
     cgm_reading = Column(Integer, nullable=False)

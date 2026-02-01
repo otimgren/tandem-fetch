@@ -1,0 +1,4 @@
+# Gitleaks configuration for tandem-fetch
+# See https://github.com/gitleaks/gitleaks for more information
+
+title = "Gitleaks config for tandem-fetch"

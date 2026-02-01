@@ -55,9 +55,7 @@ def write_raw_events_to_db(events: list[BaseEvent]) -> None:
             session.add_all(raw_event_records)
             session.commit()
 
-            logger.success(
-                f"Successfully wrote {len(raw_event_records)} events to database"
-            )
+            logger.success(f"Successfully wrote {len(raw_event_records)} events to database")
 
     except Exception as e:
         logger.error(f"Failed to write events to database: {e}")
@@ -73,18 +71,13 @@ def _serialize_datetime_objects(obj: object) -> object:
     Returns:
         Object with Arrow datetimes converted to ISO strings and binary data to base64 strings
     """
-    if hasattr(
-        obj, "isoformat"
-    ):  # Arrow datetime objects have isoformat method
+    if hasattr(obj, "isoformat"):  # Arrow datetime objects have isoformat method
         return obj.isoformat()  # type: ignore[attr-defined]
     elif isinstance(obj, (bytes, bytearray)):
         # Convert binary data to base64 string for JSON serialization
         return base64.b64encode(bytes(obj)).decode("utf-8")
     elif isinstance(obj, dict):
-        return {
-            key: _serialize_datetime_objects(value)
-            for key, value in obj.items()
-        }
+        return {key: _serialize_datetime_objects(value) for key, value in obj.items()}
     elif isinstance(obj, list):
         return [_serialize_datetime_objects(item) for item in obj]
     elif isinstance(obj, tuple):

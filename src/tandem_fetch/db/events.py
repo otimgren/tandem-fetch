@@ -25,9 +25,7 @@ class Event(Base):
 
     __tablename__ = "events"
 
-    id = Column(
-        Integer, Sequence("events_id_seq"), primary_key=True, autoincrement=True
-    )
+    id = Column(Integer, Sequence("events_id_seq"), primary_key=True, autoincrement=True)
     raw_events_id = Column(Integer, nullable=False, unique=True)
     created = Column(DateTime, default=func.now(), nullable=False)
     timestamp = Column(DateTime, nullable=False)

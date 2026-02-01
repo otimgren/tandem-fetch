@@ -16,9 +16,7 @@ class BasalDelivery(Base):
         primary_key=True,
         autoincrement=True,
     )
-    events_id = Column(
-        Integer, ForeignKey("events.id"), nullable=False, unique=True
-    )
+    events_id = Column(Integer, ForeignKey("events.id"), nullable=False, unique=True)
     timestamp = Column(DateTime, nullable=False)
     profile_basal_rate = Column(Integer)
     algorithm_basal_rate = Column(Integer)

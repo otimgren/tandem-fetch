@@ -46,7 +46,7 @@ HEADER_SIZE = 10
 
 
 def unpack_command_for(field_def):
-    return f'struct.unpack_from({field_def["type"].upper()}, raw[:EVENT_LEN], {HEADER_SIZE + field_def["offset"]})'
+    return f"struct.unpack_from({field_def['type'].upper()}, raw[:EVENT_LEN], {HEADER_SIZE + field_def['offset']})"
 
 
 TEMPLATE = '''
@@ -113,11 +113,11 @@ def build_fields(event_def):
     ret = []
     for name, field in event_def["data"].items():
         suffix = "_raw" if "transform" in field else ""
-        f = f'{fieldNameFormat(name)}{suffix}: {TYPE_TO_PYOBJ[field["type"]]}'
+        f = f"{fieldNameFormat(name)}{suffix}: {TYPE_TO_PYOBJ[field['type']]}"
         if "uom" in field:
             f += " # " + field["uom"]
         ret.append(f)
-    return "\n".join([f'{" "*4}{f}' for f in ret])
+    return "\n".join([f"{' ' * 4}{f}" for f in ret])
 
 
 def build_decode(event_def):
@@ -132,7 +132,7 @@ def build_decode(event_def):
         p2 = f"{fieldNameFormat(name)}{suffix} = {fieldNameFormat(name)},"
         p2s.append(p2)
 
-    return "\n".join([f'{" "*8}{f}' for f in p1s]), "\n".join([f'{" "*12}{f}' for f in p2s])
+    return "\n".join([f"{' ' * 8}{f}" for f in p1s]), "\n".join([f"{' ' * 12}{f}" for f in p2s])
 
 
 def build_transform_funcs(event_def):
@@ -150,7 +150,7 @@ def build_transform_funcs(event_def):
         for tx in field["transform"]:
             ret += TRANSFORMS[tx[0]](event_def, name, fieldNameFormat(name), field, tx[1])
 
-    return "\n".join([f'{" "*4}{f}' if f else "" for f in ret])
+    return "\n".join([f"{' ' * 4}{f}" if f else "" for f in ret])
 
 
 def build_event(event_id, event_def):
@@ -168,13 +168,13 @@ def build_event(event_id, event_def):
 def build_events_map(events):
     ret = ["EVENT_IDS = {"]
     for event_id, event_def in events.items():
-        ret += [f'{" "*4}{event_id}: {eventNameFormat(event_def["name"])},']
+        ret += [f"{' ' * 4}{event_id}: {eventNameFormat(event_def['name'])},"]
 
     ret += ["}", ""]
 
     ret += ["EVENT_NAMES = {"]
     for event_id, event_def in events.items():
-        ret += [f'{" "*4}"{event_def["name"]}": {eventNameFormat(event_def["name"])},']
+        ret += [f'{" " * 4}"{event_def["name"]}": {eventNameFormat(event_def["name"])},']
 
     ret += ["}", ""]
 

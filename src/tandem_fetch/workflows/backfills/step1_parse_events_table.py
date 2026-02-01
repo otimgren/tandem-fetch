@@ -71,9 +71,7 @@ def parse_and_insert_events(raw_events: list[RawEvent]) -> None:
         for raw_event in raw_events:
             event_data = raw_event.raw_event_data
 
-            event_timestamp = dateutil.parser.parse(
-                event_data["event_timestamp"]
-            )
+            event_timestamp = dateutil.parser.parse(event_data["event_timestamp"])
             event_id = int(event_data["event_id"])
             event_name = EVENT_IDS[int(event_data["raw_event"]["id"])].NAME
             del event_data["raw_event"]

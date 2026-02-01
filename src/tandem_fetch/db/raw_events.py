@@ -21,9 +21,7 @@ class RawEvent(Base):
 
     __tablename__ = "raw_events"
 
-    id = Column(
-        Integer, Sequence("raw_events_id_seq"), primary_key=True, autoincrement=True
-    )
+    id = Column(Integer, Sequence("raw_events_id_seq"), primary_key=True, autoincrement=True)
     created = Column(DateTime, default=func.now(), nullable=False)
     raw_event_data = Column(JSON, nullable=False)
 

@@ -17,8 +17,6 @@ def fetch_pump_events_for_time_range(
     if end is None:
         end = datetime.datetime.now()
     logger.info(f"Fetching pump events from {start} to {end}")
-    pump_events = api.get_pump_events(
-        start_date=start.date(), end_date=end.date()
-    )
+    pump_events = api.get_pump_events(start_date=start.date(), end_date=end.date())
     logger.info(f"Fetched {len(pump_events):,} pump events")
     return pump_events

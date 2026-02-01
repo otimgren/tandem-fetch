@@ -27,15 +27,15 @@ class TSourceAPI:
     LOGIN_API_URL = "https://tdcservices.tandemdiabetes.com/accounts/api/login"
     TDC_OIDC_CLIENT_ID = "0oa27ho9tpZE9Arjy4h7"
     TDC_AUTH_CALLBACK_URL = "https://sso.tandemdiabetes.com/auth/callback"
-    TDC_TOKEN_ENDPOINT = (
-        "https://tdcservices.tandemdiabetes.com/accounts/api/connect/token"  # noqa: S105
-    )
-    TDC_AUTH_ENDPOINT = (
-        "https://tdcservices.tandemdiabetes.com/accounts/api/connect/authorize"
-    )
+    TDC_TOKEN_ENDPOINT = "https://tdcservices.tandemdiabetes.com/accounts/api/connect/token"  # noqa: S105
+    TDC_AUTH_ENDPOINT = "https://tdcservices.tandemdiabetes.com/accounts/api/connect/authorize"
     TDC_OIDC_ISSUER = "https://tdcservices.tandemdiabetes.com/accounts/api"
-    TDC_OIDC_CONFIG_URL = "https://tdcservices.tandemdiabetes.com/accounts/api/.well-known/openid-configuration"
-    TDC_OIDC_JWKS_URL = "https://tdcservices.tandemdiabetes.com/accounts/api/.well-known/openid-configuration/jwks"
+    TDC_OIDC_CONFIG_URL = (
+        "https://tdcservices.tandemdiabetes.com/accounts/api/.well-known/openid-configuration"
+    )
+    TDC_OIDC_JWKS_URL = (
+        "https://tdcservices.tandemdiabetes.com/accounts/api/.well-known/openid-configuration/jwks"
+    )
     SOURCE_URL = "https://source.tandemdiabetes.com"
 
     def __init__(self, credentials: TConnectCredentials) -> None:
@@ -113,9 +113,9 @@ class TSourceAPI:
             headers={"Referer": self.LOGIN_PAGE_URL, **self.other_headers},
             allow_redirects=True,
         )
-        oidc_callback_code = urllib.parse.parse_qs(
-            urllib.parse.urlparse(auth_response.url).query
-        )["code"][0]
+        oidc_callback_code = urllib.parse.parse_qs(urllib.parse.urlparse(auth_response.url).query)[
+            "code"
+        ][0]
 
         oidc_params = {
             "grant_type": "authorization_code",
@@ -139,17 +139,13 @@ class TSourceAPI:
     @staticmethod
     def _generate_code_verifier() -> str:
         """Generate a high-entropy code verifier."""
-        return (
-            base64.urlsafe_b64encode(os.urandom(64)).decode("utf-8").rstrip("=")
-        )
+        return base64.urlsafe_b64encode(os.urandom(64)).decode("utf-8").rstrip("=")
 
     @staticmethod
     def _generate_code_challenge(verifier: str) -> str:
         """Generate a code challenge from the code verifier."""
         sha256_digest = hashlib.sha256(verifier.encode("utf-8")).digest()
-        return (
-            base64.urlsafe_b64encode(sha256_digest).decode("utf-8").rstrip("=")
-        )
+        return base64.urlsafe_b64encode(sha256_digest).decode("utf-8").rstrip("=")
 
     def _load_pumper_id(self) -> None:
         """Extract the pumper ID and account ID from the ID token.
@@ -182,8 +178,7 @@ class TSourceAPI:
         pump_event_metadata = self.get_pump_event_metadata()
         filtered_event_metadata = list(
             filter(
-                lambda x: x["serialNumber"]
-                == self.credentials.pump_serial_number,
+                lambda x: x["serialNumber"] == self.credentials.pump_serial_number,
                 pump_event_metadata,
             )
         )
@@ -218,9 +213,7 @@ class TSourceAPI:
             raise requests.HTTPError(msg, response=response)
         return response.json()
 
-    def _get_pump_events_raw(
-        self, start_date: datetime.date, end_date: datetime.date
-    ) -> str:
+    def _get_pump_events_raw(self, start_date: datetime.date, end_date: datetime.date) -> str:
         """Get raw pump events."""
         if self.tconnect_device_id is None:
             self._load_pump_device_id()
@@ -229,9 +222,7 @@ class TSourceAPI:
             "minDate": start_date.strftime("%Y-%m-%d"),
             "maxDate": end_date.strftime("%Y-%m-%d"),
         }
-        event_ids = "%2C".join(
-            str(event_code) for event_code in list(EVENT_IDS.keys())
-        )
+        event_ids = "%2C".join(str(event_code) for event_code in list(EVENT_IDS.keys()))
         query = f"{urllib.parse.urlencode(params)}&eventIds={event_ids}"
         url = (
             f"{self.SOURCE_URL}/api/reports/reportsfacade/pumpevents/{self.pumper_id}/"
@@ -256,8 +247,6 @@ class TSourceAPI:
         if end_date is None:
             end_date = datetime.date.today()
 
-        raw_pump_events = self._get_pump_events_raw(
-            start_date=start_date, end_date=end_date
-        )
+        raw_pump_events = self._get_pump_events_raw(start_date=start_date, end_date=end_date)
         decoded_events = decode_raw_events(raw_pump_events)
         return list(get_event_generator(decoded_events))

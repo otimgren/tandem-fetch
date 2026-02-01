@@ -1,0 +1,443 @@
+# Pre-Commit Configuration Contract
+# This file documents the expected structure of .pre-commit-config.yaml for tandem-fetch
+# Based on prek/pre-commit specification: https://prek.j178.dev/
+
+# Schema Version: 1.0.0
+# Date: 2026-01-31
+# Purpose: Define the hook configuration contract for consistent code quality and security
+
+---
+# Example Configuration Structure
+
+repos:
+  # Repository 1: Built-in Hooks (prek-specific, offline, instant)
+  - repo: builtin
+    hooks:
+      - id: trailing-whitespace
+        name: "Remove trailing whitespace"
+        description: "Removes whitespace from line endings"
+        types: [text]
+        args:
+          - --markdown-linebreak-ext=md  # Preserve markdown line breaks
+
+      - id: end-of-file-fixer
+        name: "Ensure files end with newline"
+        description: "Adds newline at end of file if missing"
+        types: [text]
+
+      - id: mixed-line-ending
+        name: "Normalize line endings"
+        description: "Converts CRLF to LF (Unix-style)"
+        types: [text]
+        args:
+          - --fix=lf  # Options: auto, lf, crlf, no
+
+      - id: check-yaml
+        name: "Validate YAML files"
+        description: "Checks YAML syntax for errors"
+        types: [yaml]
+
+      - id: check-toml
+        name: "Validate TOML files"
+        description: "Checks TOML syntax for errors (e.g., pyproject.toml, credentials)"
+        types: [toml]
+
+      - id: check-json
+        name: "Validate JSON files"
+        description: "Checks JSON syntax for errors"
+        types: [json]
+
+      - id: check-added-large-files
+        name: "Prevent large file commits"
+        description: "Blocks files larger than specified threshold"
+        types: [text, binary]
+        args:
+          - --maxkb=1000  # Default: 1MB, adjust as needed
+
+      - id: check-case-conflict
+        name: "Detect case conflicts"
+        description: "Prevents case-insensitive filename conflicts (README vs readme)"
+        types: [text]
+
+      - id: check-merge-conflict
+        name: "Detect merge conflict markers"
+        description: "Blocks commits with unresolved <<<<<<< markers"
+        types: [text]
+
+  # Repository 2: Ruff (formatter and linter)
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.14.14  # Update with: prek auto-update
+    hooks:
+      - id: ruff
+        name: "Ruff linter with auto-fix"
+        description: "Lints Python code and fixes issues (import sorting, style, etc.)"
+        types: [python]
+        args:
+          - --fix                    # Auto-fix issues when possible
+          - --exit-non-zero-on-fix   # Return non-zero if fixes were applied
+
+      - id: ruff-format
+        name: "Ruff formatter"
+        description: "Formats Python code for consistent style"
+        types: [python]
+        # No args needed, uses pyproject.toml config
+
+  # Repository 3: Gitleaks (secret detection)
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.24.3  # Update with: prek auto-update
+    hooks:
+      - id: gitleaks
+        name: "Secret detection"
+        description: "Scans for API keys, passwords, tokens, and PII"
+        types: [text]
+        # Uses .gitleaks.toml for configuration
+
+---
+# Configuration Schema Definition
+
+ConfigSchema:
+  repos:
+    type: array
+    required: true
+    description: "List of hook repositories"
+    items:
+      type: object
+      properties:
+        repo:
+          type: string
+          required: true
+          description: "Repository URL or 'builtin' for prek built-in hooks"
+          examples:
+            - "builtin"
+            - "https://github.com/astral-sh/ruff-pre-commit"
+            - "https://github.com/gitleaks/gitleaks"
+
+        rev:
+          type: string
+          required: false  # Not required for 'builtin' repo
+          description: "Git tag/branch to use for hook version"
+          examples:
+            - "v0.14.14"
+            - "v8.24.3"
+            - "main"
+
+        hooks:
+          type: array
+          required: true
+          description: "List of hooks to run from this repository"
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                required: true
+                description: "Unique hook identifier"
+
+              name:
+                type: string
+                required: false
+                description: "Human-readable hook name"
+
+              description:
+                type: string
+                required: false
+                description: "What the hook does"
+
+              types:
+                type: array
+                required: false
+                description: "File types to run hook on"
+                items:
+                  type: string
+                  enum: [text, binary, python, yaml, toml, json, markdown]
+
+              files:
+                type: string
+                required: false
+                description: "Glob or regex pattern to match files"
+                examples:
+                  - "^src/.*\\.py$"      # Regex (both prek and pre-commit)
+                  - "src/**/*.py"         # Glob (prek only)
+
+              exclude:
+                type: string
+                required: false
+                description: "Glob or regex pattern to exclude files"
+                examples:
+                  - "^tests/fixtures/.*"  # Regex
+                  - "tests/fixtures/**"   # Glob (prek only)
+
+              args:
+                type: array
+                required: false
+                description: "Command-line arguments passed to hook"
+                items:
+                  type: string
+                examples:
+                  - ["--fix"]
+                  - ["--maxkb=1000"]
+                  - ["--markdown-linebreak-ext=md"]
+
+              additional_dependencies:
+                type: array
+                required: false
+                description: "Extra Python packages to install for this hook"
+                items:
+                  type: string
+
+---
+# Hook Execution Order and Priority
+
+# Prek executes hooks in the order defined in the config file.
+# Hooks with the same priority can run in parallel.
+
+ExecutionOrder:
+  1_fast_validation:
+    description: "Fast checks that fail quickly"
+    hooks:
+      - check-yaml
+      - check-toml
+      - check-json
+      - check-added-large-files
+      - check-case-conflict
+      - check-merge-conflict
+
+  2_file_cleanup:
+    description: "Auto-fix file formatting issues"
+    hooks:
+      - trailing-whitespace
+      - end-of-file-fixer
+      - mixed-line-ending
+
+  3_code_linting:
+    description: "Lint code and fix issues"
+    hooks:
+      - ruff  # Must run before ruff-format
+
+  4_code_formatting:
+    description: "Format code for consistent style"
+    hooks:
+      - ruff-format  # Must run after ruff
+
+  5_security:
+    description: "Security scans (can run in parallel with above)"
+    hooks:
+      - gitleaks
+
+---
+# File Type Mappings
+
+FileTypes:
+  text:
+    description: "Any text file (UTF-8 encoded)"
+    extensions: [.py, .md, .yaml, .yml, .toml, .json, .txt, .sh]
+
+  python:
+    description: "Python source files"
+    extensions: [.py, .pyi]
+
+  yaml:
+    description: "YAML configuration files"
+    extensions: [.yaml, .yml]
+
+  toml:
+    description: "TOML configuration files"
+    extensions: [.toml]
+    examples:
+      - pyproject.toml
+      - sensitive/credentials.toml
+
+  json:
+    description: "JSON data files"
+    extensions: [.json]
+
+  markdown:
+    description: "Markdown documentation"
+    extensions: [.md, .markdown]
+
+---
+# Hook Arguments Reference
+
+HookArgs:
+  trailing-whitespace:
+    --markdown-linebreak-ext:
+      type: string
+      description: "Preserve line breaks in markdown (two spaces at line end)"
+      default: "md,markdown"
+
+  mixed-line-ending:
+    --fix:
+      type: string
+      enum: [auto, lf, crlf, no]
+      description: "Line ending style to enforce"
+      default: "auto"
+
+  check-added-large-files:
+    --maxkb:
+      type: integer
+      description: "Maximum file size in kilobytes"
+      default: 500
+
+  ruff:
+    --fix:
+      type: boolean
+      description: "Automatically fix issues when possible"
+
+    --exit-non-zero-on-fix:
+      type: boolean
+      description: "Return non-zero exit code if fixes were applied"
+
+---
+# Environment Variables
+
+EnvironmentVars:
+  SKIP:
+    type: string
+    description: "Comma-separated list of hook IDs to skip for this commit"
+    examples:
+      - "SKIP=gitleaks git commit"
+      - "SKIP=ruff,gitleaks git commit"
+
+  PRE_COMMIT_COLOR:
+    type: string
+    enum: [auto, always, never]
+    description: "Control colored output"
+    default: "auto"
+
+---
+# Related Configuration Files
+
+RelatedConfigs:
+  .gitleaks.toml:
+    description: "Gitleaks secret detection configuration"
+    location: "Repository root"
+    purpose: "Define allowlists, custom patterns, excluded paths"
+
+  .gitleaksignore:
+    description: "Gitleaks ignore file (per-line patterns)"
+    location: "Repository root"
+    purpose: "Ignore specific false positive strings"
+
+  pyproject.toml:
+    description: "Python project configuration"
+    location: "Repository root"
+    purpose: "Configure ruff linting and formatting rules"
+    relevant_sections:
+      - "[tool.ruff]"
+      - "[tool.ruff.lint]"
+      - "[tool.ruff.format]"
+
+---
+# Compliance and Quality Gates
+
+QualityGates:
+  formatting:
+    enforced_by: [ruff-format]
+    criteria: "All Python code must pass ruff format check"
+    auto_fix: true
+
+  linting:
+    enforced_by: [ruff]
+    criteria: "All Python code must pass ruff lint check"
+    auto_fix: true  # Where possible
+
+  security:
+    enforced_by: [gitleaks]
+    criteria: "No secrets or PII allowed in commits"
+    auto_fix: false
+
+  file_validation:
+    enforced_by: [check-yaml, check-toml, check-json]
+    criteria: "All config files must have valid syntax"
+    auto_fix: false
+
+  file_hygiene:
+    enforced_by: [trailing-whitespace, end-of-file-fixer, mixed-line-ending]
+    criteria: "All files must follow standard formatting conventions"
+    auto_fix: true
+
+---
+# Version Maintenance Strategy
+
+VersionMaintenance:
+  update_frequency: "Weekly or as needed"
+  update_command: "prek auto-update --cooldown-days 7"
+  pinning_strategy: "Pin to specific versions (rev: vX.Y.Z)"
+  breaking_changes: "Review release notes before updating"
+
+---
+# Performance Expectations
+
+Performance:
+  cold_install:
+    prek: "~18 seconds (first time)"
+    pre_commit: "~187 seconds (first time)"
+
+  typical_commit:
+    files: "1-5 modified files"
+    execution_time: "<1 second"
+    breakdown:
+      builtin_hooks: "<50ms"
+      ruff: "<200ms"
+      gitleaks: "<300ms"
+
+  large_commit:
+    files: "20+ modified files"
+    execution_time: "<2 seconds"
+
+  cache_size:
+    typical: "~800MB"
+    maximum: "~1.5GB (after many hook updates)"
+
+---
+# Escape Hatches
+
+BypassMechanisms:
+  skip_specific_hook:
+    command: "SKIP=<hook-id> git commit"
+    use_case: "Known false positive or exceptional case"
+    example: "SKIP=gitleaks git commit -m 'Add test fixture'"
+
+  skip_all_hooks:
+    command: "git commit --no-verify"
+    use_case: "Emergency hotfix only"
+    warning: "Use sparingly, prefer fixing issues"
+
+  temporary_disable:
+    method: "Comment out hook in .pre-commit-config.yaml"
+    use_case: "Disable hook for multiple commits"
+    remember: "Re-enable when done"
+
+---
+# Testing Strategy
+
+Testing:
+  unit_test_hooks:
+    command: "prek run --all-files"
+    frequency: "After config changes"
+
+  specific_hook_test:
+    command: "prek run <hook-id>"
+    example: "prek run gitleaks"
+
+  file_specific_test:
+    command: "prek run --files <path>"
+    example: "prek run --files src/tandem_fetch/my_file.py"
+
+  validation_checks:
+    - "Verify all hooks pass on clean codebase"
+    - "Test false positive handling in gitleaks"
+    - "Measure hook execution time"
+    - "Verify auto-fix behavior"
+
+---
+# Schema Version History
+
+SchemaVersions:
+  "1.0.0":
+    date: "2026-01-31"
+    changes:
+      - "Initial schema for tandem-fetch pre-commit hooks"
+      - "Defined repos: builtin, ruff, gitleaks"
+      - "Documented hook execution order"
+      - "Added performance expectations"

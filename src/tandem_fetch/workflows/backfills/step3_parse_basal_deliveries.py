@@ -43,9 +43,7 @@ def populate_basal_deliveries() -> None:
         result = conn.execute(query)
         conn.commit()
 
-        logger.success(
-            f"Inserted {result.rowcount} basal deliveries using raw SQL"
-        )
+        logger.success(f"Inserted {result.rowcount} basal deliveries using raw SQL")
 
 
 @flow

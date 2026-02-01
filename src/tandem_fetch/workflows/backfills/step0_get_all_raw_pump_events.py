@@ -25,10 +25,12 @@ def _get_latest_updated_at() -> datetime.datetime | None:
     with engine.connect() as conn:
         # Query for the latest event_timestamp from the JSON data
         # Using DuckDB's json_extract_string function
-        result = conn.execute(text("""
+        result = conn.execute(
+            text("""
             SELECT MAX(json_extract_string(raw_event_data, '$.event_timestamp'))
             FROM raw_events
-        """)).scalar()
+        """)
+        ).scalar()
 
         if result is None:
             return None

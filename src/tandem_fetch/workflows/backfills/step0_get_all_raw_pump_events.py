@@ -2,29 +2,39 @@
 
 import datetime
 
+import dateutil.parser
 from loguru import logger
 from prefect import flow
-from sqlalchemy import create_engine, func
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine, text
 
-from tandem_fetch.db.raw_events import RawEvent
 from tandem_fetch.definitions import DATABASE_URL
 from tandem_fetch.tasks import auth, fetch, raw_events
 
 
 def _get_latest_updated_at() -> datetime.datetime | None:
-    """Get the latest created timestamp from the raw_events table."""
+    """Get the latest event timestamp from the raw_events table.
+
+    Uses the actual event_timestamp from the pump data (not the DB insertion time)
+    to ensure we don't miss events if a previous fetch was interrupted.
+    """
     if not DATABASE_URL:
         return None
 
     engine = create_engine(DATABASE_URL)
-    Session = sessionmaker(bind=engine)
 
-    with Session() as session:
-        result = session.query(func.max(RawEvent.created)).scalar()
+    with engine.connect() as conn:
+        # Query for the latest event_timestamp from the JSON data
+        # Using DuckDB's json_extract_string function
+        result = conn.execute(text("""
+            SELECT MAX(json_extract_string(raw_event_data, '$.event_timestamp'))
+            FROM raw_events
+        """)).scalar()
+
         if result is None:
             return None
-        return result
+
+        # Parse the ISO timestamp string to datetime
+        return dateutil.parser.parse(result)
 
 
 @flow

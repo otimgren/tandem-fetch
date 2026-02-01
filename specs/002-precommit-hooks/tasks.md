@@ -55,15 +55,15 @@
 
 ### Implementation for User Story 1
 
-- [ ] T007 [US1] Add ruff formatter configuration to `[tool.ruff.format]` section in pyproject.toml (quote-style="double", indent-style="space")
-- [ ] T008 [US1] Add ruff linter configuration to `[tool.ruff.lint]` section in pyproject.toml with extend-select=["I"] for import sorting
-- [ ] T009 [US1] Add ruff-pre-commit repository to .pre-commit-config.yaml with rev v0.14.14
-- [ ] T010 [US1] Add ruff hook (linter) to .pre-commit-config.yaml with args: [--fix, --exit-non-zero-on-fix]
-- [ ] T011 [US1] Add ruff-format hook (formatter) to .pre-commit-config.yaml after ruff hook
-- [ ] T012 [US1] Run `prek run ruff-format --all-files` to format entire codebase
-- [ ] T013 [US1] Commit formatted files with message "Apply ruff formatting to codebase"
-- [ ] T014 [US1] Validate SC-001: Run `ruff format --check` to verify all files are consistently formatted
-- [ ] T015 [US1] Validate SC-008: Create test file with unsorted imports, attempt commit, verify auto-fix
+- [x] T007 [US1] Add ruff formatter configuration to `[tool.ruff.format]` section in pyproject.toml (quote-style="double", indent-style="space")
+- [x] T008 [US1] Add ruff linter configuration to `[tool.ruff.lint]` section in pyproject.toml with extend-select=["I"] for import sorting
+- [x] T009 [US1] Add ruff-pre-commit repository to .pre-commit-config.yaml with rev v0.14.14
+- [x] T010 [US1] Add ruff hook (linter) to .pre-commit-config.yaml with args: [--fix, --exit-non-zero-on-fix]
+- [x] T011 [US1] Add ruff-format hook (formatter) to .pre-commit-config.yaml after ruff hook
+- [x] T012 [US1] Run `prek run ruff-format --all-files` to format entire codebase
+- [x] T013 [US1] Commit formatted files with message "Apply ruff formatting to codebase"
+- [x] T014 [US1] Validate SC-001: Run `ruff format --check` to verify all files are consistently formatted
+- [x] T015 [US1] Validate SC-008: Create test file with unsorted imports, attempt commit, verify auto-fix
 
 **Checkpoint**: User Story 1 complete - automatic code formatting working
 

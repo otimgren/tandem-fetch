@@ -12,3 +12,9 @@ repos:
         args: [--fix, --exit-non-zero-on-fix]
       # Run formatter second
       - id: ruff-format
+
+  # Gitleaks: Secret detection
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.24.3
+    hooks:
+      - id: gitleaks

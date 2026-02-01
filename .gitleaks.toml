@@ -2,3 +2,12 @@
 # See https://github.com/gitleaks/gitleaks for more information
 
 title = "Gitleaks config for tandem-fetch"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Allowlist for known false positives"
+paths = [
+  '''.*/tests/fixtures/.*''',  # Exclude test fixture files
+]

@@ -31,31 +31,34 @@ pump_serial = "12345678"
 
 ## Usage
 
-### Fetch All Data
+### Run Complete Pipeline (Recommended)
 
 ```bash
-uv run get-all-raw-pump-events
+uv run run-pipeline
 ```
 
-This command:
-- Creates the database automatically if it doesn't exist
-- Fetches all pump events from Tandem Source
-- Stores raw events in `data/tandem.db`
-- On subsequent runs, only fetches new data (incremental)
+This runs the entire workflow:
+1. Fetches raw pump events from Tandem Source (incremental)
+2. Parses raw events into structured events table
+3. Extracts CGM readings
+4. Extracts basal deliveries
 
-### Process Data Pipeline
+### Individual Steps
 
-After fetching raw data, process it through the pipeline:
+You can also run each step separately:
 
 ```bash
-# Parse raw events into structured events table
-uv run python -m tandem_fetch.workflows.backfills.step1_parse_events_table
+# Step 0: Fetch raw events
+uv run get-all-raw-pump-events
 
-# Extract CGM readings
-uv run python -m tandem_fetch.workflows.backfills.step2_parse_cgm_readings
+# Step 1: Parse raw events into structured events table
+uv run parse-events
 
-# Extract basal deliveries
-uv run python -m tandem_fetch.workflows.backfills.step3_parse_basal_deliveries
+# Step 2: Extract CGM readings
+uv run parse-cgm-readings
+
+# Step 3: Extract basal deliveries
+uv run parse-basal-deliveries
 ```
 
 ## Querying Data

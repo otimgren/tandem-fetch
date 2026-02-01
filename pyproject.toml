@@ -24,7 +24,11 @@ dependencies = [
 
 [project.scripts]
 tandem-fetch = "tandem_fetch:main"
+run-pipeline = "tandem_fetch.workflows.backfills.run_full_pipeline:run_full_pipeline"
 get-all-raw-pump-events = "tandem_fetch.workflows.backfills.step0_get_all_raw_pump_events:get_all_raw_pump_events_flow"
+parse-events = "tandem_fetch.workflows.backfills.step1_parse_events_table:parse_raw_events_flow"
+parse-cgm-readings = "tandem_fetch.workflows.backfills.step2_parse_cgm_readings:populate_cgm_readings_flow"
+parse-basal-deliveries = "tandem_fetch.workflows.backfills.step3_parse_basal_deliveries:populate_basal_deliveries_flow"
 
 [build-system]
 requires = ["hatchling"]

@@ -1,0 +1,53 @@
+[
+  {
+    "event_id": 1001,
+    "event_name": "LID_BASAL_RATE_CHANGE",
+    "timestamp": "2024-01-01T10:00:00+00:00",
+    "event_data": {
+      "commandedbasalrate": 0.85,
+      "basebasalrate": 0.85,
+      "maxbasalrate": 3.0,
+      "IDP": 1,
+      "changetype_raw": 0
+    }
+  },
+  {
+    "event_id": 1002,
+    "event_name": "LID_CGM_DATA_READING",
+    "timestamp": "2024-01-01T10:05:00+00:00",
+    "event_data": {
+      "currentglucosedisplayvalue": 120,
+      "trendArrow": 4
+    }
+  },
+  {
+    "event_id": 1003,
+    "event_name": "LID_CGM_DATA_READING",
+    "timestamp": "2024-01-01T10:10:00+00:00",
+    "event_data": {
+      "currentglucosedisplayvalue": 125,
+      "trendArrow": 3
+    }
+  },
+  {
+    "event_id": 1004,
+    "event_name": "LID_BASAL_RATE_CHANGE",
+    "timestamp": "2024-01-01T10:15:00+00:00",
+    "event_data": {
+      "commandedbasalrate": 0.90,
+      "basebasalrate": 0.85,
+      "maxbasalrate": 3.0,
+      "IDP": 1,
+      "changetype_raw": 2
+    }
+  },
+  {
+    "event_id": 1005,
+    "event_name": "LID_CGM_DATA_READING",
+    "timestamp": "2024-01-01T10:20:00+00:00",
+    "event_data": {
+      "currentglucosedisplayvalue": 130,
+      "trendArrow": 3
+    }
+  }
+]

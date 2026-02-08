@@ -1,0 +1,92 @@
+[
+  {
+    "ID": 3,
+    "NAME": "LID_BASAL_RATE_CHANGE",
+    "raw_event": {
+      "id": 3,
+      "event_len": 26,
+      "timestamp": "2024-01-01T06:00:00+00:00",
+      "seqNum": 3001,
+      "eventParams": "AAA="
+    },
+    "event_timestamp": "2024-01-01T06:00:00+00:00",
+    "event_id": 3001,
+    "commandedbasalrate": 0.75,
+    "basebasalrate": 0.75,
+    "maxbasalrate": 3.0,
+    "IDP": 1,
+    "changetype_raw": 0
+  },
+  {
+    "ID": 3,
+    "NAME": "LID_BASAL_RATE_CHANGE",
+    "raw_event": {
+      "id": 3,
+      "event_len": 26,
+      "timestamp": "2024-01-01T07:00:00+00:00",
+      "seqNum": 3002,
+      "eventParams": "AAA="
+    },
+    "event_timestamp": "2024-01-01T07:00:00+00:00",
+    "event_id": 3002,
+    "commandedbasalrate": 0.80,
+    "basebasalrate": 0.80,
+    "maxbasalrate": 3.0,
+    "IDP": 1,
+    "changetype_raw": 0
+  },
+  {
+    "ID": 3,
+    "NAME": "LID_BASAL_RATE_CHANGE",
+    "raw_event": {
+      "id": 3,
+      "event_len": 26,
+      "timestamp": "2024-01-01T08:00:00+00:00",
+      "seqNum": 3003,
+      "eventParams": "AAA="
+    },
+    "event_timestamp": "2024-01-01T08:00:00+00:00",
+    "event_id": 3003,
+    "commandedbasalrate": 0.85,
+    "basebasalrate": 0.85,
+    "maxbasalrate": 3.0,
+    "IDP": 1,
+    "changetype_raw": 0
+  },
+  {
+    "ID": 3,
+    "NAME": "LID_BASAL_RATE_CHANGE",
+    "raw_event": {
+      "id": 3,
+      "event_len": 26,
+      "timestamp": "2024-01-01T09:00:00+00:00",
+      "seqNum": 3004,
+      "eventParams": "AAA="
+    },
+    "event_timestamp": "2024-01-01T09:00:00+00:00",
+    "event_id": 3004,
+    "commandedbasalrate": 0.90,
+    "basebasalrate": 0.90,
+    "maxbasalrate": 3.0,
+    "IDP": 1,
+    "changetype_raw": 0
+  },
+  {
+    "ID": 3,
+    "NAME": "LID_BASAL_RATE_CHANGE",
+    "raw_event": {
+      "id": 3,
+      "event_len": 26,
+      "timestamp": "2024-01-01T10:00:00+00:00",
+      "seqNum": 3005,
+      "eventParams": "AAA="
+    },
+    "event_timestamp": "2024-01-01T10:00:00+00:00",
+    "event_id": 3005,
+    "commandedbasalrate": 0.95,
+    "basebasalrate": 0.95,
+    "maxbasalrate": 3.0,
+    "IDP": 1,
+    "changetype_raw": 0
+  }
+]

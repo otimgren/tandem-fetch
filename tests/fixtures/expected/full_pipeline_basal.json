@@ -1,0 +1,16 @@
+[
+  {
+    "timestamp": "2024-01-01T10:00:00+00:00",
+    "profile_basal_rate": 0.85,
+    "algorithm_basal_rate": 0.85,
+    "temp_basal_rate": 0.0,
+    "event_id": 1001
+  },
+  {
+    "timestamp": "2024-01-01T10:15:00+00:00",
+    "profile_basal_rate": 0.90,
+    "algorithm_basal_rate": 0.85,
+    "temp_basal_rate": 0.0,
+    "event_id": 1004
+  }
+]

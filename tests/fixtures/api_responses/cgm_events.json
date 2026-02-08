@@ -1,0 +1,107 @@
+[
+  {
+    "ID": 198,
+    "NAME": "LID_CGM_DATA_READING",
+    "raw_event": {
+      "id": 198,
+      "event_len": 26,
+      "timestamp": "2024-01-01T08:00:00+00:00",
+      "seqNum": 2001,
+      "eventParams": "AAA="
+    },
+    "event_timestamp": "2024-01-01T08:00:00+00:00",
+    "event_id": 2001,
+    "currentglucosedisplayvalue": 95,
+    "trendArrow": 4
+  },
+  {
+    "ID": 198,
+    "NAME": "LID_CGM_DATA_READING",
+    "raw_event": {
+      "id": 198,
+      "event_len": 26,
+      "timestamp": "2024-01-01T08:05:00+00:00",
+      "seqNum": 2002,
+      "eventParams": "AAA="
+    },
+    "event_timestamp": "2024-01-01T08:05:00+00:00",
+    "event_id": 2002,
+    "currentglucosedisplayvalue": 98,
+    "trendArrow": 3
+  },
+  {
+    "ID": 198,
+    "NAME": "LID_CGM_DATA_READING",
+    "raw_event": {
+      "id": 198,
+      "event_len": 26,
+      "timestamp": "2024-01-01T08:10:00+00:00",
+      "seqNum": 2003,
+      "eventParams": "AAA="
+    },
+    "event_timestamp": "2024-01-01T08:10:00+00:00",
+    "event_id": 2003,
+    "currentglucosedisplayvalue": 102,
+    "trendArrow": 3
+  },
+  {
+    "ID": 198,
+    "NAME": "LID_CGM_DATA_READING",
+    "raw_event": {
+      "id": 198,
+      "event_len": 26,
+      "timestamp": "2024-01-01T08:15:00+00:00",
+      "seqNum": 2004,
+      "eventParams": "AAA="
+    },
+    "event_timestamp": "2024-01-01T08:15:00+00:00",
+    "event_id": 2004,
+    "currentglucosedisplayvalue": 107,
+    "trendArrow": 3
+  },
+  {
+    "ID": 198,
+    "NAME": "LID_CGM_DATA_READING",
+    "raw_event": {
+      "id": 198,
+      "event_len": 26,
+      "timestamp": "2024-01-01T08:20:00+00:00",
+      "seqNum": 2005,
+      "eventParams": "AAA="
+    },
+    "event_timestamp": "2024-01-01T08:20:00+00:00",
+    "event_id": 2005,
+    "currentglucosedisplayvalue": 112,
+    "trendArrow": 3
+  },
+  {
+    "ID": 198,
+    "NAME": "LID_CGM_DATA_READING",
+    "raw_event": {
+      "id": 198,
+      "event_len": 26,
+      "timestamp": "2024-01-01T08:25:00+00:00",
+      "seqNum": 2006,
+      "eventParams": "AAA="
+    },
+    "event_timestamp": "2024-01-01T08:25:00+00:00",
+    "event_id": 2006,
+    "currentglucosedisplayvalue": 115,
+    "trendArrow": 4
+  },
+  {
+    "ID": 198,
+    "NAME": "LID_CGM_DATA_READING",
+    "raw_event": {
+      "id": 198,
+      "event_len": 26,
+      "timestamp": "2024-01-01T08:30:00+00:00",
+      "seqNum": 2007,
+      "eventParams": "AAA="
+    },
+    "event_timestamp": "2024-01-01T08:30:00+00:00",
+    "event_id": 2007,
+    "currentglucosedisplayvalue": 118,
+    "trendArrow": 4
+  }
+]

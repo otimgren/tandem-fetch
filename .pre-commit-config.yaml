@@ -35,3 +35,15 @@ repos:
     rev: v8.24.3
     hooks:
       - id: gitleaks
+
+  # Pytest: Fast integration tests
+  - repo: local
+    hooks:
+      - id: pytest-fast
+        name: pytest-fast
+        entry: uv run pytest
+        args: ['-m', 'not slow', '-n', 'auto', '-x', '--tb=short', '-q']
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [pre-commit]

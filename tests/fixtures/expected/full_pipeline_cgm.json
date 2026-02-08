@@ -1,0 +1,17 @@
+[
+  {
+    "timestamp": "2024-01-01T10:05:00+00:00",
+    "cgm_reading": 120,
+    "event_id": 1002
+  },
+  {
+    "timestamp": "2024-01-01T10:10:00+00:00",
+    "cgm_reading": 125,
+    "event_id": 1003
+  },
+  {
+    "timestamp": "2024-01-01T10:20:00+00:00",
+    "cgm_reading": 130,
+    "event_id": 1005
+  }
+]

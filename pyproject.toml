@@ -39,6 +39,12 @@ dev = [
     "ipython>=9.5.0",
     "prek>=0.3.1",
 ]
+test = [
+    "pytest>=8.0.0",
+    "pytest-xdist>=3.5.0",
+    "requests-mock>=1.12.0",
+    "pytest-alembic>=0.11.0",
+]
 
 [tool.ruff]
 line-length = 100
@@ -50,3 +56,15 @@ indent-style = "space"
 
 [tool.ruff.lint]
 extend-select = ["I"]  # Enable isort import sorting
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = "-n auto --dist loadfile --tb=short"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+]

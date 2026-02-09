@@ -123,8 +123,8 @@
 - [x] T037 [P] Document CI workflow in README.md Continuous Integration section
 - [x] T038 [P] Document troubleshooting common CI issues in README.md
 - [x] T039 Add optional documentation for setting up branch protection rules on main branch in README.md
-- [ ] T040 Run through quickstart.md verification steps to validate all acceptance criteria
-- [ ] T041 Verify all success criteria from spec.md are met (SC-001 through SC-008)
+- [x] T040 Run through quickstart.md verification steps to validate all acceptance criteria
+- [x] T041 Verify all success criteria from spec.md are met (SC-001 through SC-008)
 
 **Checkpoint**: Documentation complete, CI fully operational and validated
 

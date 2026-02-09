@@ -1,0 +1,172 @@
+# GitHub Actions CI Workflow Contract
+
+# This file documents the expected structure and behavior of the CI workflow
+# It serves as a contract for what the workflow MUST provide
+
+workflow:
+  name: CI
+  description: Continuous integration workflow for tandem-fetch project
+
+  triggers:
+    push:
+      branches:
+        - main
+      description: Run CI on every push to main branch to validate main branch health
+
+    pull_request:
+      branches:
+        - main
+      description: Run CI on pull requests targeting main to validate proposed changes
+
+  permissions:
+    contents: read
+    description: Read-only access to repository contents (principle of least privilege)
+
+  jobs:
+    ci:
+      runner: ubuntu-latest
+      description: Single consolidated job for linting and testing
+
+      steps:
+        - name: Checkout code
+          action: actions/checkout@v4
+          required: true
+          description: Clone repository at commit being tested
+
+        - name: Set up uv
+          action: astral-sh/setup-uv@v7
+          required: true
+          config:
+            enable-cache: true
+            cache-dependency-glob: "uv.lock"
+          description: Install uv package manager with dependency caching enabled
+
+        - name: Set up Python
+          command: uv python install 3.12
+          required: true
+          description: Install Python 3.12 to match project constraint
+
+        - name: Install dependencies
+          command: uv sync --locked --all-extras --group dev --group test
+          required: true
+          description: Install project dependencies from locked file
+
+        - name: Run ruff check
+          command: uv run ruff check .
+          required: true
+          fail_fast: true
+          description: Run linting checks (fast-fail before tests)
+
+        - name: Run ruff format check
+          command: uv run ruff format --check .
+          required: true
+          fail_fast: true
+          description: Verify code formatting compliance
+
+        - name: Run tests
+          command: uv run pytest
+          required: true
+          description: Execute full test suite with parallel execution
+          expected_duration: 30-120 seconds
+
+        - name: Prune cache
+          command: uv cache prune --ci
+          required: true
+          condition: always()
+          description: Clean up cache to reduce storage costs
+
+  outputs:
+    status_check:
+      name: ci
+      description: GitHub status check displayed on PRs
+      states:
+        pending: Workflow is running
+        success: All steps passed
+        failure: One or more steps failed
+      blocking: true
+      description_detail: This status check blocks PR merges when failing
+
+  performance_targets:
+    cold_start: < 3 minutes (no cache)
+    warm_start: < 2 minutes (with cache)
+    lint_duration: < 30 seconds
+    test_duration: < 2 minutes
+    total_duration: < 5 minutes
+
+  failure_modes:
+    syntax_error:
+      step: Run ruff check
+      exit_code: non-zero
+      resolution: Fix linting errors shown in output
+
+    format_error:
+      step: Run ruff format check
+      exit_code: non-zero
+      resolution: Run 'uv run ruff format .' locally
+
+    test_failure:
+      step: Run tests
+      exit_code: non-zero
+      resolution: Review pytest output to identify failing tests
+
+    dependency_failure:
+      step: Install dependencies
+      exit_code: non-zero
+      resolution: Verify uv.lock is up to date, check for platform issues
+
+  security_requirements:
+    - Pin all action versions (no @main or @master)
+    - Use read-only GITHUB_TOKEN permissions
+    - No secrets needed (tests use mocked APIs)
+    - Cache keys include week number for automatic rotation
+
+  maintenance:
+    update_frequency:
+      actions: Monthly (via Dependabot or manual)
+      dependencies: As needed (via uv lock updates)
+
+    monitoring:
+      - Track workflow duration trends
+      - Monitor cache hit rates
+      - Review failed runs for flaky tests
+
+# Local CI Script Contract
+
+local_ci_script:
+  name: run-ci-locally.sh
+  location: .github/scripts/run-ci-locally.sh
+  description: Local execution script that replicates CI workflow
+
+  requirements:
+    - MUST use identical commands to GitHub Actions workflow
+    - MUST exit with non-zero code on any failure
+    - MUST run without requiring arguments
+    - SHOULD complete in similar time to GitHub Actions
+
+  usage: |
+    bash .github/scripts/run-ci-locally.sh
+
+  expected_output:
+    success: "All checks passed" (exit 0)
+    failure: "Check failed: <step name>" (exit 1)
+
+# Branch Protection Contract
+
+branch_protection:
+  branch: main
+  description: Rules enforced on main branch via GitHub settings
+
+  required_status_checks:
+    strict: true
+    contexts:
+      - ci
+    description: Require 'ci' status check to pass and branch to be up-to-date
+
+  enforcement:
+    require_pull_request: true
+    required_approvals: 0 (single-user project)
+    enforce_admins: false (allow admin bypass for single-user)
+
+  configuration:
+    location: GitHub UI → Settings → Branches → Branch protection rules
+    setup_required: Manual (cannot be version-controlled)

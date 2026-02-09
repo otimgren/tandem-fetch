@@ -1,5 +1,7 @@
 # Tandem Fetch
 
+![CI](https://github.com/otimgren/tandem-fetch/workflows/CI/badge.svg)
+
 Fetch and store insulin pump data from Tandem Source for personal analytics.
 
 Based on [tconnectsync](https://github.com/jwoglom/tconnectsync).
@@ -147,6 +149,86 @@ Tandem Source API
 cgm_readings  basal_deliveries
 ```
 
+## Continuous Integration
+
+GitHub Actions automatically runs tests on every push and pull request. The CI workflow:
+- Runs ruff linting and formatting checks
+- Executes the full test suite (37 tests) with parallel execution
+- Caches dependencies for faster runs
+- Completes in under 2 minutes
+
+### Running CI Locally
+
+Before pushing code, you can run the same CI checks locally:
+
+```bash
+bash .github/scripts/run-ci-locally.sh
+```
+
+This script runs:
+1. Dependency installation (`uv sync`)
+2. Ruff linting (`ruff check`)
+3. Ruff formatting check (`ruff format --check`)
+4. Full test suite (`pytest`)
+
+**Tip**: Running CI locally helps catch issues before pushing, saving time and CI resources.
+
+### CI Performance
+
+The CI workflow is optimized for speed:
+
+- **Dependency caching**: Dependencies are cached based on `uv.lock`, reducing setup time from ~3 minutes to under 1 minute on subsequent runs
+- **Parallel test execution**: Tests run in parallel using pytest-xdist (`-n auto`), typically providing 2-3x speedup
+- **Expected timings**:
+  - Cold start (no cache): < 3 minutes
+  - Warm start (with cache): < 2 minutes
+  - Test suite: ~10 seconds (37 tests in parallel)
+
+Cache is automatically refreshed weekly and when `uv.lock` changes.
+
+### Troubleshooting CI
+
+**CI fails with linting errors:**
+```bash
+# Fix automatically
+uv run ruff check --fix .
+uv run ruff format .
+```
+
+**CI fails with test errors:**
+```bash
+# Run tests locally to debug
+uv run pytest -v
+# Or run specific test file
+uv run pytest tests/path/to/test_file.py -v
+```
+
+**Dependencies out of sync:**
+```bash
+# Ensure uv.lock is up to date
+uv lock
+# Then sync dependencies
+uv sync --locked --all-extras --group dev --group test
+```
+
+**CI is unusually slow:**
+- Check if cache was invalidated (uv.lock changed)
+- First run after uv.lock change will be slower (rebuilding cache)
+- Subsequent runs should be fast (~2 minutes total)
+
+### Optional: Branch Protection
+
+To prevent merging code that fails CI:
+
+1. Go to GitHub: **Settings → Branches → Branch protection rules**
+2. Add rule for `main` branch
+3. Enable:
+   - ☑ Require status checks to pass before merging
+   - ☑ Status checks: Select `ci`
+   - ☑ Require branches to be up to date before merging
+
+This ensures only code that passes all tests can be merged to main.
+
 ## File Structure
 
 | Path | Description |
@@ -155,3 +237,5 @@ cgm_readings  basal_deliveries
 | `sensitive/credentials.toml` | Tandem credentials (gitignored) |
 | `src/tandem_fetch/` | Source code |
 | `alembic/` | Database migrations |
+| `.github/workflows/ci.yml` | GitHub Actions CI workflow |
+| `.github/scripts/run-ci-locally.sh` | Local CI validation script |

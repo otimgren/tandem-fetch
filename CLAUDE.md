@@ -24,6 +24,7 @@ cd src [ONLY COMMANDS FOR ACTIVE TECHNOLOGIES][ONLY COMMANDS FOR ACTIVE TECHNOLO
 Python 3.12: Follow standard conventions
 
 ## Recent Changes
+- 004-github-actions-ci: Added [if applicable, e.g., PostgreSQL, CoreData, files or N/A]
 - 002-precommit-hooks: Added Python 3.12 (existing project constraint) + prek (pre-commit hook manager), ruff (formatter/linter), gitleaks (secret detection)
 
 - 001-duckdb-migration: Added Python 3.12 + SQLAlchemy 2.x, duckdb-engine, Prefect, loguru

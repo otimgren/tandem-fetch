@@ -13,7 +13,25 @@
       "WebFetch(domain:prek.j178.dev)",
       "Bash(.specify/scripts/bash/update-agent-context.sh:*)",
       "Bash(uv run prek run:*)",
-      "Bash(uv run pytest:*)"
+      "Bash(uv run pytest:*)",
+      "Bash(uv run ruff format:*)",
+      "Bash(for i in {017..026})",
+      "Bash(do sed -i '' \"s/^- \\\\[ \\\\] T$i/- [x] T$i/\" /Users/oskari/projects/tandem-fetch/specs/004-github-actions-ci/tasks.md)",
+      "Bash(done)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "uv run ruff format $file_path",
+            "statusMessage": "Formatting with ruff..."
+          }
+        ]
+      }
     ]
   }
 }

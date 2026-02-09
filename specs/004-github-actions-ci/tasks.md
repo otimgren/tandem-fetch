@@ -64,7 +64,7 @@
 - [x] T013 [US1] Add cache pruning step using "uv cache prune --ci" with if: always() in .github/workflows/ci.yml
 - [x] T014 [US1] Verify workflow file syntax is valid YAML
 - [x] T015 [US1] Commit and push workflow file to trigger first CI run
-- [ ] T016 [US1] Verify CI runs successfully on the push and status check appears
+- [x] T016 [US1] Verify CI runs successfully on the push and status check appears
 
 **Checkpoint**: At this point, CI automatically runs on every push and PR. Core CI functionality is complete and testable.
 

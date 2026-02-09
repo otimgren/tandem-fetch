@@ -1,0 +1,145 @@
+# API Response Schema for Tandem Source API Mock Fixtures
+# Defines expected structure and data types for mock API responses
+
+AuthenticationResponse:
+  type: object
+  required:
+    - access_token
+    - id_token
+    - token_type
+    - expires_in
+  properties:
+    access_token:
+      type: string
+      description: Bearer token for API authentication
+    id_token:
+      type: string
+      description: JWT ID token containing user/pumper information
+    token_type:
+      type: string
+      enum: [Bearer]
+    expires_in:
+      type: integer
+      description: Token expiration time in seconds
+    refresh_token:
+      type: string
+      description: Optional refresh token
+
+PumpEventResponse:
+  type: object
+  required:
+    - ID
+    - NAME
+    - raw_event
+    - event_timestamp
+    - event_id
+  properties:
+    ID:
+      type: integer
+      description: Event type ID
+    NAME:
+      type: string
+      description: Event type name
+    raw_event:
+      type: object
+      required:
+        - id
+        - event_len
+        - timestamp
+        - seqNum
+      properties:
+        id:
+          type: integer
+          description: Event type code
+        event_len:
+          type: integer
+          description: Length of raw event data
+        timestamp:
+          type: string
+          format: iso8601
+          description: Event timestamp
+        seqNum:
+          type: integer
+          description: Event sequence number
+        eventParams:
+          type: string
+          description: Base64 encoded event parameters
+    event_timestamp:
+      type: string
+      format: iso8601
+      description: Event timestamp in ISO format
+    event_id:
+      type: integer
+      description: Unique event identifier
+
+CGMEventResponse:
+  allOf:
+    - $ref: '#/PumpEventResponse'
+  type: object
+  required:
+    - currentglucosedisplayvalue
+    - trendArrow
+  properties:
+    currentglucosedisplayvalue:
+      type: integer
+      minimum: 20
+      maximum: 400
+      description: Glucose value in mg/dL
+    trendArrow:
+      type: integer
+      minimum: 1
+      maximum: 7
+      description: Trend arrow indicator (1=DoubleDown, 2=SingleDown, 3=FortyFiveDown, 4=Flat, 5=FortyFiveUp, 6=SingleUp, 7=DoubleUp)
+
+BasalEventResponse:
+  allOf:
+    - $ref: '#/PumpEventResponse'
+  type: object
+  required:
+    - commandedbasalrate
+    - basebasalrate
+    - maxbasalrate
+    - IDP
+    - changetype_raw
+  properties:
+    commandedbasalrate:
+      type: number
+      minimum: 0
+      maximum: 10
+      description: Commanded basal rate in units/hour
+    basebasalrate:
+      type: number
+      minimum: 0
+      maximum: 10
+      description: Base basal rate in units/hour
+    maxbasalrate:
+      type: number
+      minimum: 0
+      maximum: 10
+      description: Maximum basal rate in units/hour
+    IDP:
+      type: integer
+      description: Insulin delivery profile identifier
+    changetype_raw:
+      type: integer
+      minimum: 0
+      maximum: 7
+      description: Type of basal rate change (0=timed segment, 1=new profile, 2=temp start, 3=temp end, 4=suspended, 5=resumed, 6=shutdown, 7=limit)
+
+PumpEventsArrayResponse:
+  type: array
+  items:
+    $ref: '#/PumpEventResponse'
+  description: Array of pump events from API
+
+CGMEventsArrayResponse:
+  type: array
+  items:
+    $ref: '#/CGMEventResponse'
+  description: Array of CGM events from API
+
+BasalEventsArrayResponse:
+  type: array
+  items:
+    $ref: '#/BasalEventResponse'
+  description: Array of basal delivery events from API

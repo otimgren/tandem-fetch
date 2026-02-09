@@ -12,7 +12,8 @@
       "Bash(find:*)",
       "WebFetch(domain:prek.j178.dev)",
       "Bash(.specify/scripts/bash/update-agent-context.sh:*)",
-      "Bash(uv run prek run:*)"
+      "Bash(uv run prek run:*)",
+      "Bash(uv run pytest:*)"
     ]
   }
 }

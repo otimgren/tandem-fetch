@@ -1,0 +1,17 @@
+[
+  {
+    "timestamp": "2024-01-01T10:05:00+00:00",
+    "cgm_reading": 120,
+    "trend_arrow": 4
+  },
+  {
+    "timestamp": "2024-01-01T10:10:00+00:00",
+    "cgm_reading": 125,
+    "trend_arrow": 3
+  },
+  {
+    "timestamp": "2024-01-01T10:20:00+00:00",
+    "cgm_reading": 130,
+    "trend_arrow": 3
+  }
+]

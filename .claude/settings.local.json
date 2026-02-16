@@ -17,7 +17,8 @@
       "Bash(uv run ruff format:*)",
       "Bash(for i in {017..026})",
       "Bash(do sed -i '' \"s/^- \\\\[ \\\\] T$i/- [x] T$i/\" /Users/oskari/projects/tandem-fetch/specs/004-github-actions-ci/tasks.md)",
-      "Bash(done)"
+      "Bash(done)",
+      "Bash(uv run:*)"
     ]
   },
   "hooks": {

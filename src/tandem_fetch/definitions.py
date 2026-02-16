@@ -9,4 +9,7 @@ CREDENTIALS_PATH = ROOT_DIR / Path("sensitive/credentials.toml")
 DATABASE_PATH = ROOT_DIR / "data" / "tandem.db"
 DATABASE_URL = f"duckdb:///{DATABASE_PATH}"
 
+# Export configuration
+EXPORT_DIR = ROOT_DIR / "exports"
+
 TIMEZONE_NAME = "America/Los_Angeles"

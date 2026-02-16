@@ -80,6 +80,180 @@ uv run parse-cgm-readings
 uv run parse-basal-deliveries
 ```
 
+## Exporting Data
+
+The `export-data` command fetches the latest data and exports it to Parquet or CSV format for analysis in Python, R, Excel, or other tools.
+
+### Quick Start (First Time Setup)
+
+For first-time users, run the full pipeline once to populate the database:
+
+```bash
+# 1. Run pipeline to fetch and process data (one-time setup)
+uv run run-pipeline
+
+# 2. Export all tables to Parquet (recommended for data science)
+uv run export-data
+
+# Or export just CGM readings
+uv run export-data --tables cgm_readings
+
+# Your data is now in: exports/
+```
+
+### Basic Usage
+
+```bash
+# Export all tables (fetches latest data automatically)
+uv run export-data
+
+# Export single table
+uv run export-data --tables cgm_readings
+
+# Export multiple specific tables
+uv run export-data --tables cgm_readings basal_deliveries events
+
+# Export to CSV for Excel/spreadsheets
+uv run export-data --tables cgm_readings --format csv
+
+# Specify custom output directory
+uv run export-data --tables cgm_readings --output-dir ~/diabetes-data
+```
+
+### Advanced Options
+
+**Skip pipeline run** (use existing data, faster):
+```bash
+uv run export-data --tables cgm_readings --no-fetch
+```
+
+**Date range filtering** (export only specific period):
+```bash
+# Last 7 days
+uv run export-data --tables cgm_readings \
+  --start-date 2026-01-01 --end-date 2026-01-07
+
+# Everything from specific date onwards
+uv run export-data --tables cgm_readings --start-date 2026-01-01
+
+# Everything up to specific date
+uv run export-data --tables cgm_readings --end-date 2026-12-31
+```
+
+**Overwrite existing files**:
+```bash
+uv run export-data --tables cgm_readings --overwrite
+```
+
+**Verbose output** (see detailed progress):
+```bash
+uv run export-data --tables cgm_readings --verbose
+```
+
+### Available Tables
+
+- `cgm_readings` - Continuous glucose monitoring data (most commonly exported)
+- `basal_deliveries` - Basal insulin delivery data
+- `events` - Parsed pump events (boluses, alarms, etc.)
+- `raw_events` - Raw API responses (source of truth)
+
+### Using Exported Data
+
+**In Python (Pandas)**:
+```python
+import pandas as pd
+
+# Read Parquet file
+df = pd.read_parquet('exports/cgm_readings_20260208_103000.parquet')
+
+# Quick analysis
+print(df.describe())
+print(f"Time in range (70-180): {len(df[(df['cgm_reading'] >= 70) & (df['cgm_reading'] <= 180)]) / len(df) * 100:.1f}%")
+```
+
+**In Python (Polars - faster)**:
+```python
+import polars as pl
+
+# Read Parquet file
+df = pl.read_parquet('exports/cgm_readings_20260208_103000.parquet')
+
+# Quick analysis
+print(df.describe())
+```
+
+**In Excel**:
+1. Export to CSV: `uv run export-data --tables cgm_readings --format csv`
+2. Open the CSV file in Excel or Google Sheets
+
+**In R**:
+```r
+library(arrow)
+df <- read_parquet("exports/cgm_readings_20260208_103000.parquet")
+```
+
+### Tips
+
+- **First export**: Always run `uv run run-pipeline` first to populate the database
+- **Subsequent exports**: Use `--fetch-latest` (default) to get the latest data automatically
+- **Quick re-exports**: Use `--no-fetch` to skip the pipeline and just export existing data
+- **Parquet vs CSV**: Parquet is 5x smaller and 10x faster to load - use it for data science
+- **CSV for Excel**: Use `--format csv` if you need to open the data in Excel or Google Sheets
+- **Date filtering**: Use date ranges to create smaller, focused exports for analysis
+
+### Common Workflows
+
+**Daily export** (for ongoing analysis):
+```bash
+# Fetch latest data and export all tables
+uv run export-data
+
+# Or export specific tables
+uv run export-data --tables cgm_readings basal_deliveries
+```
+
+**Weekly summary** (last 7 days):
+```bash
+uv run export-data --tables cgm_readings \
+  --start-date $(date -d '7 days ago' +%Y-%m-%d)
+```
+
+**Monthly report** (specific month):
+```bash
+uv run export-data --tables cgm_readings basal_deliveries \
+  --start-date 2026-01-01 --end-date 2026-01-31 \
+  --output-dir ~/reports/january-2026
+```
+
+**Backup all data** (full historical export):
+```bash
+# Export all tables without fetching new data
+uv run export-data --no-fetch --output-dir ~/backups/$(date +%Y%m%d)
+```
+
+### Troubleshooting
+
+**"Table not found" error**:
+```bash
+# Run pipeline first to populate the database
+uv run run-pipeline
+```
+
+**"No space left on device"**:
+```bash
+# Use a different directory with more space
+uv run export-data --tables cgm_readings --output-dir /path/with/space
+
+# Or export only recent data
+uv run export-data --tables cgm_readings --start-date 2026-01-01
+```
+
+**Want to see what's happening**:
+```bash
+# Add --verbose flag for detailed output
+uv run export-data --tables cgm_readings --verbose
+```
+
 ## Querying Data
 
 ### Using DuckDB CLI
@@ -116,7 +290,9 @@ FROM cgm_readings
 WHERE timestamp >= CURRENT_DATE - INTERVAL '7 days';
 ```
 
-### Export to Parquet/CSV
+### Export from DuckDB CLI
+
+You can also export directly from the DuckDB CLI:
 
 ```sql
 -- Export to Parquet (columnar, efficient)
@@ -125,6 +301,8 @@ COPY cgm_readings TO 'exports/cgm_readings.parquet' (FORMAT PARQUET);
 -- Export to CSV
 COPY cgm_readings TO 'exports/cgm_readings.csv' (HEADER, DELIMITER ',');
 ```
+
+**Note**: The `export-data` command (see [Exporting Data](#exporting-data) section) is recommended as it handles the full pipeline and provides more features.
 
 ### Using Python
 
@@ -234,6 +412,7 @@ This ensures only code that passes all tests can be merged to main.
 | Path | Description |
 |------|-------------|
 | `data/tandem.db` | DuckDB database (gitignored) |
+| `exports/` | Exported data files (gitignored) |
 | `sensitive/credentials.toml` | Tandem credentials (gitignored) |
 | `src/tandem_fetch/` | Source code |
 | `alembic/` | Database migrations |

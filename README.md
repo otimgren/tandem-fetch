@@ -22,15 +22,20 @@ Install pre-commit hooks to automatically format code and detect secrets:
 
 ```bash
 uv tool install prek
-prek install
+prek install --hook-type pre-commit --hook-type pre-push
 ```
 
-This ensures code quality and prevents accidentally committing sensitive data. See [Pre-Commit Hooks Guide](specs/002-precommit-hooks/quickstart.md) for details.
+**What runs when:**
+- **On commit**: Code formatting (ruff), linting, secret detection (gitleaks)
+- **On push**: All the above + full test suite
+
+This ensures code quality without slowing down commits. See [Pre-Commit Hooks Guide](specs/002-precommit-hooks/quickstart.md) for details.
 
 **Bypass hooks** (for exceptional cases only):
 ```bash
 SKIP=hook-id git commit  # Skip specific hook
 git commit --no-verify   # Skip all hooks (use sparingly)
+git push --no-verify     # Skip pre-push tests
 ```
 
 ### 3. Configure Credentials

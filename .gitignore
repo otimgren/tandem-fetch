@@ -16,6 +16,9 @@ sensitive/credentials.toml
 # Database
 data/
 
+# Exports
+exports/
+
 # IDE and Editor
 .vscode/
 .idea/

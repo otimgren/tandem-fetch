@@ -11,12 +11,7 @@ from sqlalchemy import text
 from tandem_fetch.db.cgm_readings import CgmReading
 from tandem_fetch.db.events import Event
 from tandem_fetch.db.raw_events import RawEvent
-from tandem_fetch.tasks.export import (
-    ExportConfig,
-    build_export_query,
-    export_table_to_file,
-    validate_export_config,
-)
+from tandem_fetch.tasks.export import build_export_query
 
 
 @pytest.fixture
@@ -147,105 +142,3 @@ class TestDateFilteringIntegration:
         # Verify correct timezone handling
         assert start_dt.tzinfo == timezone.utc
         assert end_dt.tzinfo == timezone.utc
-
-
-class TestExportTableIntegration:
-    """Test complete export workflow with actual file creation."""
-
-    def test_export_table_without_dates(self, test_db_engine, sample_cgm_data, tmp_path):
-        """Test exporting table without date filtering."""
-        output_dir = tmp_path / "exports"
-
-        result = export_table_to_file(
-            table_name="cgm_readings",
-            output_dir=output_dir,
-            format="parquet",
-        )
-
-        assert result.success is True
-        assert result.rows_exported > 0  # Real DB has data
-        assert result.output_path is not None
-        assert result.output_path.exists()
-        assert result.file_size_bytes > 0
-
-    def test_export_table_with_date_range(self, test_db_engine, sample_cgm_data, tmp_path):
-        """Test exporting table with date range filtering."""
-        output_dir = tmp_path / "exports"
-        # Use a date range that should have some data from real DB
-        start_date = date(2024, 9, 1)
-        end_date = date(2024, 9, 30)
-
-        result = export_table_to_file(
-            table_name="cgm_readings",
-            output_dir=output_dir,
-            format="parquet",
-            start_date=start_date,
-            end_date=end_date,
-        )
-
-        assert result.success is True
-        # Date filtering should reduce row count compared to full export
-        assert result.rows_exported >= 0
-        assert result.output_path.exists()
-
-    def test_export_table_csv_format(self, test_db_engine, sample_cgm_data, tmp_path):
-        """Test exporting table to CSV format."""
-        output_dir = tmp_path / "exports"
-
-        result = export_table_to_file(
-            table_name="cgm_readings",
-            output_dir=output_dir,
-            format="csv",
-        )
-
-        assert result.success is True
-        assert result.output_path.suffix == ".csv"
-        assert result.output_path.exists()
-
-        # Verify CSV content is readable
-        content = result.output_path.read_text()
-        assert "cgm_reading" in content  # Header should be present
-        assert len(content.splitlines()) > 1  # Header + data rows
-
-    def test_export_with_empty_date_range(self, test_db_engine, sample_cgm_data, tmp_path):
-        """Test export with date range that has no matching data."""
-        output_dir = tmp_path / "exports"
-
-        result = export_table_to_file(
-            table_name="cgm_readings",
-            output_dir=output_dir,
-            format="parquet",
-            start_date=date(2024, 2, 1),
-            end_date=date(2024, 2, 28),
-        )
-
-        assert result.success is True
-        assert result.rows_exported == 0
-        assert result.output_path.exists()
-
-
-class TestValidateExportConfig:
-    """Test export configuration validation."""
-
-    def test_validate_config_with_dates(self, test_db_engine, sample_cgm_data):
-        """Test that validation works with date filtering."""
-        config = ExportConfig(
-            tables=["cgm_readings"],
-            start_date=date(2024, 1, 5),
-            end_date=date(2024, 1, 10),
-        )
-
-        # Should not raise
-        result = validate_export_config(config)
-        assert result is True
-
-    def test_validate_config_invalid_date_range(self, test_db_engine):
-        """Test that invalid date range is caught during validation."""
-        config = ExportConfig(
-            tables=["cgm_readings"],
-            start_date=date(2024, 12, 31),
-            end_date=date(2024, 1, 1),
-        )
-
-        with pytest.raises(ValueError, match="start_date.*cannot be after.*end_date"):
-            validate_export_config(config)

@@ -22,6 +22,7 @@ dependencies = [
     "rich>=13.7.0",
     "sqlalchemy>=2.0.43",
     "typer>=0.12.0",
+    "fastmcp>=2.0",
 ]
 
 [project.scripts]
@@ -32,6 +33,7 @@ parse-events = "tandem_fetch.workflows.backfills.step1_parse_events_table:parse_
 parse-cgm-readings = "tandem_fetch.workflows.backfills.step2_parse_cgm_readings:populate_cgm_readings_flow"
 parse-basal-deliveries = "tandem_fetch.workflows.backfills.step3_parse_basal_deliveries:populate_basal_deliveries_flow"
 export-data = "tandem_fetch.workflows.export_data:main"
+tandem-mcp = "tandem_fetch.mcp.server:main"
 
 [build-system]
 requires = ["hatchling"]

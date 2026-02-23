@@ -19,7 +19,8 @@
       "Bash(do sed -i '' \"s/^- \\\\[ \\\\] T$i/- [x] T$i/\" /Users/oskari/projects/tandem-fetch/specs/004-github-actions-ci/tasks.md)",
       "Bash(done)",
       "Bash(uv run:*)",
-      "Bash(pytest:*)"
+      "Bash(pytest:*)",
+      "Bash(/Users/oskari/projects/health-stack/tandem-fetch/.specify/scripts/bash/setup-plan.sh:*)"
     ]
   },
   "hooks": {

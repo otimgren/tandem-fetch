@@ -12,7 +12,7 @@ A local server is started automatically as a subprocess and cleaned up on exit.
 
 import atexit
 import os
-import subprocess
+import subprocess  # nosec B404
 import sys
 import time
 from datetime import timedelta
@@ -38,7 +38,7 @@ def _start_prefect_server() -> subprocess.Popen:
     and minimal logging to keep console output clean.
     """
     logger.info("Starting local Prefect server...")
-    proc = subprocess.Popen(
+    proc = subprocess.Popen(  # nosec B603
         [
             sys.executable,
             "-m",

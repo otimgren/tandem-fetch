@@ -13,6 +13,7 @@ Auto-generated from all feature plans. Last updated: 2026-01-31
 - DuckDB local file at `data/tandem.db` (read-only access) (007-mcp-server)
 - Python 3.12 + Prefect 3.4.17 (existing), Loguru 0.7.3 (existing), Typer 0.12.0 (existing) (008-continuous-fetch)
 - DuckDB local file at `data/tandem.db` (existing) (008-continuous-fetch)
+- Python 3.12 + Bandit 1.x (new), pip-audit 2.x (new) — both dev-only (009-ci-security-scanning)
 
 - Python 3.12 + SQLAlchemy 2.x, duckdb-engine, Prefect, loguru (001-duckdb-migration)
 
@@ -32,10 +33,9 @@ cd src [ONLY COMMANDS FOR ACTIVE TECHNOLOGIES][ONLY COMMANDS FOR ACTIVE TECHNOLO
 Python 3.12: Follow standard conventions
 
 ## Recent Changes
+- 009-ci-security-scanning: Added Python 3.12 + Bandit 1.x (new), pip-audit 2.x (new) — both dev-only
 - 008-continuous-fetch: Added Python 3.12 + Prefect 3.4.17 (existing), Loguru 0.7.3 (existing), Typer 0.12.0 (existing)
 - 007-mcp-server: Added Python 3.12 + FastMCP 2.x, SQLAlchemy 2.0.43, duckdb-engine 0.17.0, DuckDB 1.0.0
-- 006-db-connection-helpers: Added Python 3.12 + SQLAlchemy 2.x, duckdb-engine, Prefect (for pipeline invocation)
 
 <!-- MANUAL ADDITIONS START -->
-- `uv` is used to run code, e.g. `uv run python -c "import prefect; print(prefect.__version__);`
 <!-- MANUAL ADDITIONS END -->

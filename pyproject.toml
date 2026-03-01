@@ -34,6 +34,7 @@ parse-cgm-readings = "tandem_fetch.workflows.backfills.step2_parse_cgm_readings:
 parse-basal-deliveries = "tandem_fetch.workflows.backfills.step3_parse_basal_deliveries:populate_basal_deliveries_flow"
 export-data = "tandem_fetch.workflows.export_data:main"
 tandem-mcp = "tandem_fetch.mcp.server:main"
+continuous-fetch = "tandem_fetch.workflows.continuous_fetch:main"
 
 [build-system]
 requires = ["hatchling"]

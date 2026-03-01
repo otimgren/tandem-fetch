@@ -27,7 +27,7 @@ class TSourceAPI:
     LOGIN_API_URL = "https://tdcservices.tandemdiabetes.com/accounts/api/login"
     TDC_OIDC_CLIENT_ID = "0oa27ho9tpZE9Arjy4h7"
     TDC_AUTH_CALLBACK_URL = "https://sso.tandemdiabetes.com/auth/callback"
-    TDC_TOKEN_ENDPOINT = "https://tdcservices.tandemdiabetes.com/accounts/api/connect/token"  # noqa: S105
+    TDC_TOKEN_ENDPOINT = "https://tdcservices.tandemdiabetes.com/accounts/api/connect/token"  # noqa: S105  # nosec B105
     TDC_AUTH_ENDPOINT = "https://tdcservices.tandemdiabetes.com/accounts/api/connect/authorize"
     TDC_OIDC_ISSUER = "https://tdcservices.tandemdiabetes.com/accounts/api"
     TDC_OIDC_CONFIG_URL = (
